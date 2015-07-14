@@ -36,11 +36,15 @@
 
 (defmethod %remove ((node (eql nil)) key %<)
   (declare (ignore node key %<))
-  node)
+  nil)
 
 (defmethod dict-size ((node (eql nil)))
   (declare (ignore node))
   0)
+
+(defmethod dict-reduce (func (node (eql nil)) initial-value)
+  (declare (ignore func node))
+  initial-value)
 
 
 ;; Methods for non-nil nodes
@@ -117,6 +121,17 @@
 (defmethod dict-size ((node binary-tree-node))
   (+ 1 (dict-size (bt-left node)) (dict-size (bt-right node))))
 
+(defmethod dict-reduce (func (node binary-tree-node) initial-value)
+  (let ((right-reduction (dict-reduce func
+                                      (bt-right node)
+                                      initial-value)))
+    (dict-reduce func
+                 (bt-left node)
+                 (funcall func
+                          right-reduction
+                          (bt-key node)
+                          (bt-value node)))))
+
 
 (defclass binary-tree ()
   ((root
@@ -143,6 +158,15 @@
 
 (defmethod dict-size ((tree binary-tree))
   (dict-size (tree-root tree)))
+
+(defmethod dict-reduce (func (tree binary-tree) initial-value)
+  (dict-reduce func (tree-root tree) initial-value))
+
+(defmethod dict-map (function (tree binary-tree))
+  (dict-reduce (lambda (dict k v)
+                 (dict-insert dict k (funcall function v)))
+               tree
+               (make-binary-tree (tree-%< tree))))
 
 (defun make-binary-tree (&optional (compare #'<))
   (make-instance 'binary-tree

@@ -28,5 +28,6 @@
   (is (null (-> squares
                 (dict-remove 4)
                 (dict-lookup 4))))
-  (is (= 15 (dict-size (dict-remove squares 4)))))
+  (is (= 15 (dict-size (dict-remove squares 4))))
+  (is (dict-lookup (dict-remove squares 4) 6)))
 
