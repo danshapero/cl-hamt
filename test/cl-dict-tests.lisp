@@ -31,3 +31,12 @@
   (is (= 15 (dict-size (dict-remove squares 4))))
   (is (dict-lookup (dict-remove squares 4) 6)))
 
+(test reduce
+  (is (= 120 (dict-reduce-keys #'+ squares 0)))
+  (is (equal (dict-reduce (lambda (alist k v)
+                            (cons (cons k v) alist))
+                          squares
+                          '())
+           '((0 . 0) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)
+             (6 . 36) (7 . 49) (8 . 64) (9 . 81) (10 . 100) (11 . 121)
+             (12 . 144) (13 . 169) (14 . 196) (15 . 225)))))
