@@ -7,12 +7,22 @@
 (test empty-dict
   (is (not (dict-lookup (make-binary-tree #'string>) "hello"))))
 
+
+(defvar pacers (-> (make-binary-tree #'string>)
+                   (dict-insert "Reggie Miller" 2.01)
+                   (dict-insert "Larry Bird" 2.06)
+                   (dict-insert "Detlef Schrempf" 2.08)
+                   (dict-insert "Paul George" 2.01)
+                   (dict-insert "Metta World Peace" 2.01)))
+
+
 (test inserting
-  (let ((dict (dict-insert (make-binary-tree #'string>) "hello" "Mr. Bond")))
-    (multiple-value-bind (val foundp) (dict-lookup dict "hello")
-      (is (not (null foundp)))
-      (is (eql val "Mr. Bond"))
-      (is (= 1 (dict-size dict))))))
+  (multiple-value-bind (val foundp)
+      (dict-lookup pacers "Detlef Schrempf")
+    (is (not (null foundp)))
+    (is (eql val 2.08)))
+  (is (= 5 (dict-size pacers)))
+  (is (eql 2.01 (dict-lookup pacers "Reggie Miller"))))
 
 
 (defvar squares
@@ -29,12 +39,20 @@
                 (dict-remove 4)
                 (dict-lookup 4))))
   (is (= 15 (dict-size (dict-remove squares 4))))
-  (is (dict-lookup (dict-remove squares 4) 6)))
+  (is (dict-lookup (dict-remove squares 4) 6))
+  (is (= 14 (-> squares
+                (dict-remove 4)
+                (dict-remove 12)
+                dict-size)))
+  (is (= 9 (-> squares
+               (dict-remove 4)
+               (dict-remove 12)
+               (dict-lookup 3)))))
 
 (test reduce
   (is (= 120 (dict-reduce-keys #'+ squares 0)))
   (is (equal (dict-reduce (lambda (alist k v)
-                            (cons (cons k v) alist))
+                            (acons k v alist))
                           squares
                           '())
            '((0 . 0) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)

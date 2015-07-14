@@ -162,9 +162,9 @@
 (defmethod dict-reduce (func (tree binary-tree) initial-value)
   (dict-reduce func (tree-root tree) initial-value))
 
-(defmethod dict-map (function (tree binary-tree))
+(defmethod dict-map (func (tree binary-tree))
   (dict-reduce (lambda (dict k v)
-                 (dict-insert dict k (funcall function v)))
+                 (dict-insert dict k (funcall func v)))
                tree
                (make-binary-tree (tree-%< tree))))
 

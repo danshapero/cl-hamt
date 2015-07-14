@@ -20,3 +20,9 @@
            (declare (ignore k))
            (funcall func r v)))
     (dict-reduce #'f dict initial-value)))
+
+(defun dict->alist (dict)
+  (dict-reduce (lambda (alist k v)
+                 (acons k v alist))
+               dict
+               '()))

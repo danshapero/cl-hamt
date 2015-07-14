@@ -11,8 +11,11 @@
    #:dict-reduce
    #:dict-map
    #:dict-filter
+
+   ;; Utilities, conversion routines
    #:dict-reduce-keys
    #:dict-reduce-values
+   #:dict->alist
 
    ;; Binary trees
    #:binary-tree
