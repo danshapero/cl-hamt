@@ -1,7 +1,8 @@
 
 (asdf:defsystem #:cl-dict-test
   :depends-on (#:cl-dict
-               #:fiveam)
+               #:fiveam
+               #:yoda)
   :serial t
   :components
   ((:module "test"

@@ -23,4 +23,6 @@
 
 (test removing
   (is (= 16 (dict-lookup dict 4)))
-  (is (null (dict-lookup (dict-remove dict 4) 4))))
+  (is (null (-> dict
+                (dict-remove 4)
+                (dict-lookup 4)))))
