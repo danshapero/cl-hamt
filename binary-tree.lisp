@@ -5,7 +5,6 @@
 (defgeneric %insert (node key value %<))
 (defgeneric %remove (node key %<))
 
-
 (defclass binary-tree-node ()
   ((key
    :initarg :key
@@ -38,6 +37,10 @@
 (defmethod %remove ((node (eql nil)) key %<)
   (declare (ignore node key %<))
   node)
+
+(defmethod dict-size ((node (eql nil)))
+  (declare (ignore node))
+  0)
 
 
 ;; Methods for non-nil nodes
@@ -111,6 +114,9 @@
                     :right (bt-right node)))
     (t (remove-root node %<))))
 
+(defmethod dict-size ((node binary-tree-node))
+  (+ 1 (dict-size (bt-left node)) (dict-size (bt-right node))))
+
 
 (defclass binary-tree ()
   ((root
@@ -134,6 +140,9 @@
   (make-instance 'binary-tree
                  :root (%remove (tree-root tree) key (tree-%< tree))
                  :compare (tree-%< tree)))
+
+(defmethod dict-size ((tree binary-tree))
+  (dict-size (tree-root tree)))
 
 (defun make-binary-tree (&optional (compare #'<))
   (make-instance 'binary-tree
