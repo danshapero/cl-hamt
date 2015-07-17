@@ -118,13 +118,32 @@
                  (t item))))
     v))
 
+(defun vec-update (vec pos item)
+  (let* ((len (length vec))
+         (v (make-array len)))
+    (loop for i below len do
+         (setf (aref v i)
+               (if (= i pos)
+                   item
+                   (aref vec i))))
+    v))
+
 (defmethod %hamt-insert ((node table-node) key value hash depth test)
   (let* ((bitmap (table-bitmap node))
          (array (table-array node))
          (bits (get-bits hash depth))
          (index (get-index bits bitmap)))
     (if (logbitp bits bitmap)
-        (%hamt-insert (aref array index) key value hash (1+ depth) test)
+        (make-instance 'table-node
+                       :bitmap bitmap
+                       :table (vec-update array
+                                          index
+                                          (%hamt-insert (aref array index)
+                                                        key
+                                                        value
+                                                        hash
+                                                        (1+ depth)
+                                                        test)))
         (let ((new-node (if (= depth 6)
                             (make-instance 'value-node
                                            :key key
