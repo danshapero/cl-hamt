@@ -3,7 +3,7 @@
   :description "Dictionary data structures"
   :author "Daniel Shapero <shapero.daniel@gmail.com>"
   :license "BSD"
-  ;;:depends-on (#:fiveam)
+  :depends-on (#:yoda #:cl-murmurhash)
   :serial t
   :components ((:file "package")
                (:file "dictionary")

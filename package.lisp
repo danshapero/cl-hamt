@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:cl-dict
-  (:use #:cl)
+  (:use #:cl #:yoda)
   (:export
    ;; Generics for operating on dictionaries
    #:dict-lookup
