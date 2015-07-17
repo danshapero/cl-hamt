@@ -8,7 +8,7 @@
   (is (not (dict-lookup (make-binary-tree #'string>) "hello"))))
 
 
-(defvar pacers (-> (make-binary-tree #'string>)
+(defvar pacers (-> (make-hamt)
                    (dict-insert "Reggie Miller" 2.01)
                    (dict-insert "Larry Bird" 2.06)
                    (dict-insert "Detlef Schrempf" 2.08)
@@ -30,7 +30,7 @@
              (if (= i 16)
                  d
                  (f (dict-insert d i (* i i)) (1+ i)))))
-    (f (make-binary-tree) 0)))
+    (f (make-hamt) 0)))
 
 (test removing
   (is (= 16 (dict-size squares)))

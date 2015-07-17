@@ -19,5 +19,9 @@
 
    ;; Binary trees
    #:binary-tree
-   #:make-binary-tree))
+   #:make-binary-tree
+
+   ;; Hash array-mapped tries
+   #:hamt
+   #:make-hamt))
 

@@ -7,4 +7,5 @@
   :serial t
   :components ((:file "package")
                (:file "dictionary")
-               (:file "binary-tree")))
+               (:file "binary-tree")
+               (:file "hash-array-mapped-trie")))

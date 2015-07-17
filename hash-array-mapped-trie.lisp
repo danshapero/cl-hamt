@@ -62,6 +62,18 @@
   (assoc key (conflict-alist node) :test test))
 
 
+;; Methods for getting the size of HAMT nodes
+(defmethod dict-size ((node value-node))
+  1)
+
+(defmethod dict-size ((node table-node))
+  (loop for node across (table-array node)
+     sum (dict-size node)))
+
+(defmethod dict-size ((node conflict-node))
+  (length (conflict-alist node)))
+
+
 ;; Methods for inserting inserting key/value pairs into a HAMT
 (defgeneric %hamt-insert (node key value hash depth test))
 
@@ -113,22 +125,19 @@
          (index (get-index bits bitmap)))
     (if (logbitp bits bitmap)
         (%hamt-insert (aref array index) key value hash (1+ depth) test)
-        (make-instance 'table-node
-                       :bitmap (logior bitmap (ash 1 bits))
-                       :table (vec-insert array
-                                          (max index 0)
-                                          (if (= depth 6)
-                                              (make-instance 'value-node
-                                                             :key key
-                                                             :value value)
-                                              (%hamt-insert (make-instance 'table-node
-                                                                           :bitmap 0
-                                                                           :table (make-array 0))
-                                                            key
-                                                            value
-                                                            hash
-                                                            (1+ depth)
-                                                            test)))))))
+        (let ((new-node (if (= depth 6)
+                            (make-instance 'value-node
+                                           :key key
+                                           :value value)
+                            (%hamt-insert (make-instance 'table-node)
+                                          key
+                                          value
+                                          hash
+                                          (1+ depth)
+                                          test))))
+          (make-instance 'table-node
+                         :bitmap (logior bitmap (ash 1 bits))
+                         :table (vec-insert array index new-node))))))
 
 (defclass hamt ()
     ((test
@@ -155,6 +164,9 @@
                 (funcall (hamt-hash dict) key)
                 0
                 (hamt-test dict)))
+
+(defmethod dict-size ((dict hamt))
+  (dict-size (hamt-table dict)))
 
 (defmethod dict-insert ((dict hamt) key value)
   (make-instance 'hamt
