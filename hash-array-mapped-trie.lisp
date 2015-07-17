@@ -132,31 +132,27 @@
   (let* ((bitmap (table-bitmap node))
          (array (table-array node))
          (bits (get-bits hash depth))
-         (index (get-index bits bitmap)))
-    (if (logbitp bits bitmap)
-        (make-instance 'table-node
-                       :bitmap bitmap
-                       :table (vec-update array
-                                          index
-                                          (%hamt-insert (aref array index)
-                                                        key
-                                                        value
-                                                        hash
-                                                        (1+ depth)
-                                                        test)))
-        (let ((new-node (if (= depth 6)
-                            (make-instance 'value-node
-                                           :key key
-                                           :value value)
-                            (%hamt-insert (make-instance 'table-node)
-                                          key
-                                          value
-                                          hash
-                                          (1+ depth)
-                                          test))))
-          (make-instance 'table-node
-                         :bitmap (logior bitmap (ash 1 bits))
-                         :table (vec-insert array index new-node))))))
+         (index (get-index bits bitmap))
+         (hit (logbitp bits bitmap))
+         (new-node
+          (cond
+            (hit
+             (%hamt-insert (aref array index) key value hash (1+ depth) test))
+            ((= depth 6)
+             (make-instance 'value-node :key key :value value))
+            (t
+             (%hamt-insert (make-instance 'table-node)
+                           key
+                           value
+                           hash
+                           (1+ depth)
+                           test)))))
+    (make-instance 'table-node
+                   :bitmap (logior bitmap (ash 1 bits))
+                   :table (funcall (if hit #'vec-update #'vec-insert)
+                                   array
+                                   index
+                                   new-node))))
 
 (defclass hamt ()
     ((test
