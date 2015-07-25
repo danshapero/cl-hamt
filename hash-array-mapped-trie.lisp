@@ -118,6 +118,16 @@
                  (t item))))
     v))
 
+(defun vec-remove (vec pos)
+  (let* ((len (1- (length vec)))
+         (v (make-array len)))
+    (loop for i below len do
+         (setf (aref v i)
+               (if (< i pos)
+                   (aref vec i)
+                   (aref vec (1+ i)))))
+    v))
+
 (defun vec-update (vec pos item)
   (let* ((len (length vec))
          (v (make-array len)))
@@ -153,6 +163,52 @@
                                    array
                                    index
                                    new-node))))
+
+
+;; Methods for removing entries from a HAMT
+(defgeneric %hamt-remove (node key hash depth test))
+
+(defmethod %hamt-remove ((node value-node) key hash depth test)
+  (let ((nkey (node-key node)))
+    (if (funcall test key nkey)
+        nil
+        node)))
+
+(defun alist-remove (key alist test)
+  (remove key alist :test (lambda (k p) (funcall test (car p) k))))
+
+(defmethod %hamt-remove ((node conflict-node) key hash depth test)
+  (let ((alist (alist-remove key (conflict-alist node) test)))
+    (let ((len (length alist)))
+      (cond
+        ((= len 0) nil)
+        ((= len 1) (make-instance 'value-node
+                                  :key (caar alist)
+                                  :value (cdar alist)))
+        (t (make-instance 'conflict-node
+                          :hash hash
+                          :alist alist))))))
+
+(defmethod %hamt-remove ((node table-node) key hash depth test)
+  (let* ((bitmap (table-bitmap node))
+         (array (table-array node))
+         (bits (get-bits hash depth))
+         (index (get-index bits bitmap))
+         (hit (logbitp bits bitmap)))
+    (if (not hit)
+        node
+        (let ((new-node (%hamt-remove (aref array index) key hash (1+ depth) test)))
+          (cond
+            (new-node
+             (make-instance 'table-node
+                            :bitmap bitmap
+                            :table (vec-update array index new-node)))
+            ((= bitmap 1) nil)
+            (t (make-instance 'table-node
+                              :bitmap (logxor bitmap (ash 1 bits))
+                              :table (vec-remove array index))))))))
+
+
 
 (defclass hamt ()
     ((test
@@ -190,6 +246,16 @@
                  :table (%hamt-insert (hamt-table dict)
                                       key
                                       value
+                                      (funcall (hamt-hash dict) key)
+                                      0
+                                      (hamt-test dict))))
+
+(defmethod dict-remove ((dict hamt) key)
+  (make-instance 'hamt
+                 :test (hamt-test dict)
+                 :hash (hamt-hash dict)
+                 :table (%hamt-remove (hamt-table dict)
+                                      key
                                       (funcall (hamt-hash dict) key)
                                       0
                                       (hamt-test dict))))
