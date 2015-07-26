@@ -74,7 +74,7 @@
   (length (conflict-alist node)))
 
 
-;; Methods for inserting inserting key/value pairs into a HAMT
+;; Methods for inserting key/value pairs into a HAMT
 (defgeneric %hamt-insert (node key value hash depth test))
 
 ;; Inserting into a value-node either functionally updates the value stored in
@@ -177,10 +177,16 @@
 (defun alist-remove (key alist test)
   (remove key alist :test (lambda (k p) (funcall test (car p) k))))
 
+;; Removing an entry from a conflict node reduces the scope of the hash
+;; collision. If there is now only 1 key with the given hash, we can
+;; return a value-node, since there is no longer a collision.
 (defmethod %hamt-remove ((node conflict-node) key hash depth test)
   (let ((alist (alist-remove key (conflict-alist node) test)))
     (let ((len (length alist)))
       (cond
+        ;; Can we get rid of this conditional branch? If the length of the
+        ;; alist is 0, that means it used to be 1, but we should never have
+        ;; had a conflict node with only 1 entry in the first place.
         ((= len 0) nil)
         ((= len 1) (make-instance 'value-node
                                   :key (caar alist)
@@ -189,6 +195,8 @@
                           :hash hash
                           :alist alist))))))
 
+;; Removing a key from a table node can mean updating its bitmap if there
+;; is nothing left in the corresponding branch.
 (defmethod %hamt-remove ((node table-node) key hash depth test)
   (let* ((bitmap (table-bitmap node))
          (array (table-array node))
@@ -209,7 +217,26 @@
                               :table (vec-remove array index))))))))
 
 
+;; Methods for reducing over elements of HAMTs
+(defmethod dict-reduce (func (node value-node) initial-value)
+  (funcall func initial-value (node-key node) (node-value node)))
 
+(defmethod dict-reduce (func (node conflict-node) initial-value)
+  (labels ((f (alist r)
+             (if alist
+                 (f (cdr alist)
+                    (funcall func r (caar alist) (cdar alist)))
+                 r)))
+    (f (conflict-alist node) initial-value)))
+
+(defmethod dict-reduce (func (node table-node) initial-value)
+  (reduce (lambda (r child)
+            (dict-reduce func child r))
+          (table-array node)
+          :initial-value initial-value))
+
+
+;; Wrapper HAMT class
 (defclass hamt ()
     ((test
       :reader hamt-test
@@ -259,3 +286,6 @@
                                       (funcall (hamt-hash dict) key)
                                       0
                                       (hamt-test dict))))
+
+(defmethod dict-reduce (func (dict hamt) initial-value)
+  (dict-reduce func (hamt-table dict) initial-value))

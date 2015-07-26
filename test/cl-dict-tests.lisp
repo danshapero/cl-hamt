@@ -47,14 +47,28 @@
   (is (= 9 (-> squares
                (dict-remove 4)
                (dict-remove 12)
-               (dict-lookup 3)))))
+               (dict-lookup 3))))
+  (is (= 16 (let ((fewer-squares (dict-remove squares 4)))
+              (dict-lookup squares 4)))))
+
+(defun alist-same-contents-p (alist1 alist2)
+  (labels ((f (alist)
+             (if alist
+                 (let ((p (car alist)))
+                   (if (equal p (assoc (car p) alist2))
+                       (f (cdr alist))
+                       nil))
+                 t)))
+    (and (= (length alist1) (length alist2))
+         (f alist1))))
 
 (test reduce
   (is (= 120 (dict-reduce-keys #'+ squares 0)))
-  (is (equal (dict-reduce (lambda (alist k v)
-                            (acons k v alist))
-                          squares
-                          '())
-           '((0 . 0) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)
-             (6 . 36) (7 . 49) (8 . 64) (9 . 81) (10 . 100) (11 . 121)
-             (12 . 144) (13 . 169) (14 . 196) (15 . 225)))))
+  (is (alist-same-contents-p
+       (dict-reduce (lambda (alist k v)
+                      (acons k v alist))
+                    squares
+                    '())
+       '((0 . 0) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)
+         (6 . 36) (7 . 49) (8 . 64) (9 . 81) (10 . 100) (11 . 121)
+         (12 . 144) (13 . 169) (14 . 196) (15 . 225)))))
