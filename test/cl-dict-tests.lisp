@@ -51,6 +51,27 @@
   (is (= 16 (let ((fewer-squares (dict-remove squares 4)))
               (dict-lookup squares 4)))))
 
+
+;; These pairs of strings hash to the same number under murmurhash.
+(defvar some-word-collisions
+  '(("PSYCHOANALYZE" . "BEDUCKS")
+    ("PANSPERMIES" . "NONSELF")
+    ("UNSIGHING" . "TURBITS")))
+
+;; Make a HAMT with them so we can see if we've handled collisions right.
+(defvar dict-with-collisions
+  (labels ((f (dict word-pairs)
+             (if word-pairs
+                 (let ((word1 (caar word-pairs))
+                       (word2 (cdar word-pairs)))
+                   (f (-> dict
+                          (dict-insert word1 word1)
+                          (dict-insert word2 word2))
+                      (cdr word-pairs))
+                   dict))))
+    (f (make-hamt #'equal #'cl-murmurhash:murmurhash)
+       some-word-collisions)))
+
 (defun alist-same-contents-p (alist1 alist2)
   (labels ((f (alist)
              (if alist

@@ -16,7 +16,7 @@
     :initarg :hash)
    (alist
     :reader conflict-alist
-    :initarg :values
+    :initarg :alist
     :initform '())))
 
 (defclass table-node ()
@@ -59,7 +59,10 @@
 
 (defmethod %hamt-lookup ((node conflict-node) key hash depth test)
   (declare (ignore hash depth))
-  (assoc key (conflict-alist node) :test test))
+  (let ((key-val (assoc key (conflict-alist node) :test test)))
+    (if key-val
+        (values (cdr key-val) t)
+        (values nil nil))))
 
 
 ;; Methods for getting the size of HAMT nodes
