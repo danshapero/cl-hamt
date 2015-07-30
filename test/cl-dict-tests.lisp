@@ -48,6 +48,9 @@
                (dict-remove 4)
                (dict-remove 12)
                (dict-lookup 3))))
+
+  ;; Check that the data structure is persistent, i.e. a functional update
+  ;; leaves the original HAMT intact
   (is (= 16 (let ((fewer-squares (dict-remove squares 4)))
               (dict-lookup squares 4)))))
 
@@ -67,10 +70,40 @@
                    (f (-> dict
                           (dict-insert word1 word1)
                           (dict-insert word2 word2))
-                      (cdr word-pairs))
-                   dict))))
+                      (cdr word-pairs)))
+                 dict)))
     (f (make-hamt #'equal #'cl-murmurhash:murmurhash)
        some-word-collisions)))
+
+(test collisions
+   (is (equal 6 (dict-size dict-with-collisions)))
+
+   ;; Check that all the keys were inserted properly
+   (is (equal "PSYCHOANALYZE"
+              (dict-lookup dict-with-collisions "PSYCHOANALYZE")))
+   (is (equal "BEDUCKS"
+              (dict-lookup dict-with-collisions "BEDUCKS")))
+   (is (equal "PANSPERMIES"
+              (dict-lookup dict-with-collisions "PANSPERMIES")))
+   (is (equal "NONSELF"
+              (dict-lookup dict-with-collisions "NONSELF")))
+   (is (equal "UNSIGHING"
+              (dict-lookup dict-with-collisions "UNSIGHING")))
+   (is (not (dict-lookup dict-with-collisions "IRIDOCYCLITIS")))
+
+   ;; Check that updating into a key with a hash conflict works
+   (is (equal "KATY PERRY"
+              (dict-lookup (dict-insert dict-with-collisions
+                                        "NONSELF"
+                                        "KATY PERRY")
+                           "NONSELF")))
+
+   ;; Check that removing a key with a hash collision still leaves the key
+   ;; it originally collided with in the dictionary
+   (is (equal "PSYCHOANALYZE"
+              (dict-lookup (dict-remove dict-with-collisions "BEDUCKS")
+                           "PSYCHOANALYZE"))))
+
 
 (defun alist-same-contents-p (alist1 alist2)
   (labels ((f (alist)
