@@ -292,3 +292,11 @@
 
 (defmethod dict-reduce (func (dict hamt) initial-value)
   (dict-reduce func (hamt-table dict) initial-value))
+
+(defmethod dict-filter (predicate (dict hamt))
+  (dict-reduce (lambda (filtered-dict k v)
+                 (if (funcall predicate k v)
+                     (dict-insert filtered-dict k v)
+                     filtered-dict))
+               dict
+               (make-hamt (hamt-test dict) (hamt-hash dict))))

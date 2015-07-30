@@ -126,3 +126,14 @@
        '((0 . 0) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)
          (6 . 36) (7 . 49) (8 . 64) (9 . 81) (10 . 100) (11 . 121)
          (12 . 144) (13 . 169) (14 . 196) (15 . 225)))))
+
+(defvar tall-pacers (dict-filter (lambda (k v)
+                                   (declare (ignore k))
+                                   (> v 2.01))
+                                 pacers))
+
+(test filter
+  (is (= 2 (dict-size tall-pacers)))
+  (is-true (dict-lookup tall-pacers "Larry Bird"))
+  (is-true (dict-lookup tall-pacers "Detlef Schrempf"))
+  (is-false (dict-lookup tall-pacers "Reggie Miller")))
