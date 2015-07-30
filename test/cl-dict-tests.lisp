@@ -5,7 +5,7 @@
 (in-suite dictionary)
 
 (test empty-dict
-  (is (not (dict-lookup (make-binary-tree #'string>) "hello"))))
+  (is (not (dict-lookup (make-hamt) "hello"))))
 
 
 (defvar pacers (-> (make-hamt)
