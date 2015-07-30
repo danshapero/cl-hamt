@@ -1,6 +1,6 @@
 
-(asdf:defsystem #:cl-dict-test
-  :depends-on (#:cl-dict
+(asdf:defsystem #:cl-hamt-test
+  :depends-on (#:cl-hamt
                #:fiveam
                #:yoda)
   :serial t
@@ -9,5 +9,5 @@
             :serial t
             :components
             ((:file "package")
-             (:file "cl-dict-tests")))))
+             (:file "cl-hamt-test")))))
 

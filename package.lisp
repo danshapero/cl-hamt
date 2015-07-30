@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage #:cl-dict
+(defpackage #:cl-hamt
   (:use #:cl #:yoda)
   (:export
    ;; Generics for operating on dictionaries

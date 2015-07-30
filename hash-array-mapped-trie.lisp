@@ -1,4 +1,4 @@
-(in-package :cl-dict)
+(in-package :cl-hamt)
 
 (defclass value-node ()
   ((key

@@ -1,5 +1,5 @@
 
-(in-package :cl-dict-test)
+(in-package :cl-hamt-test)
 
 (def-suite dictionary)
 (in-suite dictionary)

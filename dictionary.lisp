@@ -1,5 +1,5 @@
 
-(in-package :cl-dict)
+(in-package :cl-hamt)
 
 (defgeneric dict-lookup (dict key))
 (defgeneric dict-insert (dict key value))

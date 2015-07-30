@@ -1,4 +1,4 @@
 
-(defpackage #:cl-dict-test
-  (:use #:cl #:cl-dict #:yoda #:fiveam)
+(defpackage #:cl-hamt-test
+  (:use #:cl #:cl-hamt #:yoda #:fiveam)
   (:export #:run!))

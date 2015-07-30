@@ -1,6 +1,6 @@
 
-(asdf:defsystem #:cl-dict
-  :description "Dictionary data structures"
+(asdf:defsystem #:cl-hamt
+  :description "Dictionary data structure using hash array-mapped tries"
   :author "Daniel Shapero <shapero.daniel@gmail.com>"
   :license "BSD"
   :depends-on (#:yoda #:cl-murmurhash)
