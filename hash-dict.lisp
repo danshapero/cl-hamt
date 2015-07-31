@@ -240,7 +240,7 @@
 
 
 ;; Wrapper HAMT class
-(defclass hamt ()
+(defclass hash-dict ()
     ((test
       :reader hamt-test
       :initarg :test
@@ -256,21 +256,21 @@
                                :bitmap 0
                                :table (make-array 0)))))
 
-(defun make-hamt (&optional (test #'equal) (hash #'cl-murmurhash:murmurhash))
-  (make-instance 'hamt :test test :hash hash))
+(defun make-hash-dict (&optional (test #'equal) (hash #'cl-murmurhash:murmurhash))
+  (make-instance 'hash-dict :test test :hash hash))
 
-(defmethod dict-lookup ((dict hamt) key)
+(defmethod dict-lookup ((dict hash-dict) key)
   (%hamt-lookup (hamt-table dict)
                 key
                 (funcall (hamt-hash dict) key)
                 0
                 (hamt-test dict)))
 
-(defmethod dict-size ((dict hamt))
+(defmethod dict-size ((dict hash-dict))
   (dict-size (hamt-table dict)))
 
-(defmethod dict-insert ((dict hamt) key value)
-  (make-instance 'hamt
+(defmethod dict-insert ((dict hash-dict) key value)
+  (make-instance 'hash-dict
                  :test (hamt-test dict)
                  :hash (hamt-hash dict)
                  :table (%hamt-insert (hamt-table dict)
@@ -280,8 +280,8 @@
                                       0
                                       (hamt-test dict))))
 
-(defmethod dict-remove ((dict hamt) key)
-  (make-instance 'hamt
+(defmethod dict-remove ((dict hash-dict) key)
+  (make-instance 'hash-dict
                  :test (hamt-test dict)
                  :hash (hamt-hash dict)
                  :table (%hamt-remove (hamt-table dict)
@@ -290,13 +290,13 @@
                                       0
                                       (hamt-test dict))))
 
-(defmethod dict-reduce (func (dict hamt) initial-value)
+(defmethod dict-reduce (func (dict hash-dict) initial-value)
   (dict-reduce func (hamt-table dict) initial-value))
 
-(defmethod dict-filter (predicate (dict hamt))
+(defmethod dict-filter (predicate (dict hash-dict))
   (dict-reduce (lambda (filtered-dict k v)
                  (if (funcall predicate k v)
                      (dict-insert filtered-dict k v)
                      filtered-dict))
                dict
-               (make-hamt (hamt-test dict) (hamt-hash dict))))
+               (make-hash-dict (hamt-test dict) (hamt-hash dict))))

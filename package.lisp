@@ -18,6 +18,6 @@
    #:dict->alist
 
    ;; Hash array-mapped tries
-   #:hamt
-   #:make-hamt))
+   #:hash-dict
+   #:make-hash-dict))
 

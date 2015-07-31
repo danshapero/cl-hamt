@@ -5,10 +5,10 @@
 (in-suite dictionary)
 
 (test empty-dict
-  (is (not (dict-lookup (make-hamt) "hello"))))
+  (is (not (dict-lookup (make-hash-dict) "hello"))))
 
 
-(defvar pacers (-> (make-hamt)
+(defvar pacers (-> (make-hash-dict)
                    (dict-insert "Reggie Miller" 2.01)
                    (dict-insert "Larry Bird" 2.06)
                    (dict-insert "Detlef Schrempf" 2.08)
@@ -30,7 +30,7 @@
              (if (= i 16)
                  d
                  (f (dict-insert d i (* i i)) (1+ i)))))
-    (f (make-hamt) 0)))
+    (f (make-hash-dict) 0)))
 
 (test removing
   (is (= 16 (dict-size squares)))
@@ -72,7 +72,7 @@
                           (dict-insert word2 word2))
                       (cdr word-pairs)))
                  dict)))
-    (f (make-hamt #'equal #'cl-murmurhash:murmurhash)
+    (f (make-hash-dict #'equal #'cl-murmurhash:murmurhash)
        some-word-collisions)))
 
 (test collisions
