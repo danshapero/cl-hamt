@@ -256,7 +256,7 @@
                                :bitmap 0
                                :table (make-array 0)))))
 
-(defun make-hash-dict (&optional (test #'equal) (hash #'cl-murmurhash:murmurhash))
+(defun make-hash-dict (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
   (make-instance 'hash-dict :test test :hash hash))
 
 (defmethod dict-lookup ((dict hash-dict) key)
@@ -299,4 +299,5 @@
                      (dict-insert filtered-dict k v)
                      filtered-dict))
                dict
-               (make-hash-dict (hamt-test dict) (hamt-hash dict))))
+               (make-hash-dict :test (hamt-test dict)
+                               :hash (hamt-hash dict))))

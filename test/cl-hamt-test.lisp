@@ -72,7 +72,8 @@
                           (dict-insert word2 word2))
                       (cdr word-pairs)))
                  dict)))
-    (f (make-hash-dict #'equal #'cl-murmurhash:murmurhash)
+    (f (make-hash-dict :test #'equal
+                       :key #'cl-murmurhash:murmurhash)
        some-word-collisions)))
 
 (test collisions
