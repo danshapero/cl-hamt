@@ -56,14 +56,16 @@
 
 
 ;; Methods for getting the size of HAMT nodes
-(defmethod dict-size ((node value-node))
+(defgeneric %hamt-size (node))
+
+(defmethod %hamt-size ((node value-node))
   1)
 
-(defmethod dict-size ((node table-node))
+(defmethod %hamt-size ((node table-node))
   (loop for node across (table-array node)
-     sum (dict-size node)))
+     sum (%hamt-size node)))
 
-(defmethod dict-size ((node conflict-node))
+(defmethod %hamt-size ((node conflict-node))
   (length (conflict-alist node)))
 
 
@@ -226,7 +228,7 @@
                 (hamt-test dict)))
 
 (defmethod dict-size ((dict hash-dict))
-  (dict-size (hamt-table dict)))
+  (%hamt-size (hamt-table dict)))
 
 (defmethod dict-insert ((dict hash-dict) key value)
   (make-instance 'hash-dict
