@@ -31,16 +31,6 @@
     :initform (make-array 0 :initial-element nil))))
 
 
-;; Utility functions for operating on HAMTs
-(defun get-bits (hash depth)
-  "Extract the 5 bits needed for indexing at the present depth"
-  (declare (type integer hash depth))
-  (ldb (byte 5 (* 5 depth)) hash))
-
-(defun get-index (bits bitmap)
-  (logcount (ldb (byte bits 0) bitmap)))
-
-
 ;; Methods for looking up keys in various types of HAMT nodes
 (defgeneric %hamt-lookup (node key hash depth test))
 
@@ -109,37 +99,6 @@
                                             (cons (car kv) (cdr kv))))
                                       alist)
                               (acons key value alist)))))
-
-(defun vec-insert (vec pos item)
-  (let* ((len (1+ (length vec)))
-         (v (make-array len)))
-    (loop for i below len do
-         (setf (aref v i)
-               (cond
-                 ((< i pos) (aref vec i))
-                 ((> i pos) (aref vec (1- i)))
-                 (t item))))
-    v))
-
-(defun vec-remove (vec pos)
-  (let* ((len (1- (length vec)))
-         (v (make-array len)))
-    (loop for i below len do
-         (setf (aref v i)
-               (if (< i pos)
-                   (aref vec i)
-                   (aref vec (1+ i)))))
-    v))
-
-(defun vec-update (vec pos item)
-  (let* ((len (length vec))
-         (v (make-array len)))
-    (loop for i below len do
-         (setf (aref v i)
-               (if (= i pos)
-                   item
-                   (aref vec i))))
-    v))
 
 (defmethod %hamt-insert ((node table-node) key value hash depth test)
   (let* ((bitmap (table-bitmap node))
