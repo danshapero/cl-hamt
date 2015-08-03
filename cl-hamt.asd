@@ -6,6 +6,5 @@
   :depends-on (#:yoda #:cl-murmurhash)
   :serial t
   :components ((:file "package")
-               (:file "dictionary")
                (:file "util")
                (:file "hash-dict")))

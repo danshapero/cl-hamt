@@ -182,10 +182,12 @@
 
 
 ;; Methods for reducing over elements of HAMTs
-(defmethod dict-reduce (func (node value-node) initial-value)
+(defgeneric %hamt-reduce (func node initial-value))
+
+(defmethod %hamt-reduce (func (node value-node) initial-value)
   (funcall func initial-value (node-key node) (node-value node)))
 
-(defmethod dict-reduce (func (node conflict-node) initial-value)
+(defmethod %hamt-reduce (func (node conflict-node) initial-value)
   (labels ((f (alist r)
              (if alist
                  (f (cdr alist)
@@ -193,9 +195,9 @@
                  r)))
     (f (conflict-entries node) initial-value)))
 
-(defmethod dict-reduce (func (node table-node) initial-value)
+(defmethod %hamt-reduce (func (node table-node) initial-value)
   (reduce (lambda (r child)
-            (dict-reduce func child r))
+            (%hamt-reduce func child r))
           (table-array node)
           :initial-value initial-value))
 
@@ -220,17 +222,17 @@
 (defun make-hash-dict (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
   (make-instance 'hash-dict :test test :hash hash))
 
-(defmethod dict-lookup ((dict hash-dict) key)
+(defun dict-lookup (dict key)
   (%hamt-lookup (hamt-table dict)
                 key
                 (funcall (hamt-hash dict) key)
                 0
                 (hamt-test dict)))
 
-(defmethod dict-size ((dict hash-dict))
+(defun dict-size (dict)
   (%hamt-size (hamt-table dict)))
 
-(defmethod dict-insert ((dict hash-dict) key value)
+(defun dict-insert (dict key value)
   (make-instance 'hash-dict
                  :test (hamt-test dict)
                  :hash (hamt-hash dict)
@@ -241,7 +243,7 @@
                                       0
                                       (hamt-test dict))))
 
-(defmethod dict-remove ((dict hash-dict) key)
+(defun dict-remove (dict key)
   (make-instance 'hash-dict
                  :test (hamt-test dict)
                  :hash (hamt-hash dict)
@@ -251,10 +253,10 @@
                                       0
                                       (hamt-test dict))))
 
-(defmethod dict-reduce (func (dict hash-dict) initial-value)
-  (dict-reduce func (hamt-table dict) initial-value))
+(defun dict-reduce (func dict initial-value)
+  (%hamt-reduce func (hamt-table dict) initial-value))
 
-(defmethod dict-filter (predicate (dict hash-dict))
+(defun dict-filter (predicate dict)
   (dict-reduce (lambda (filtered-dict k v)
                  (if (funcall predicate k v)
                      (dict-insert filtered-dict k v)
@@ -262,3 +264,21 @@
                dict
                (make-hash-dict :test (hamt-test dict)
                                :hash (hamt-hash dict))))
+
+(defun dict-reduce-keys (func dict initial-value)
+  (flet ((f (r k v)
+           (declare (ignore v))
+           (funcall func r k)))
+    (dict-reduce #'f dict initial-value)))
+
+(defun dict-reduce-values (func dict initial-value)
+  (flet ((f (r k v)
+           (declare (ignore k))
+           (funcall func r v)))
+    (dict-reduce #'f dict initial-value)))
+
+(defun dict->alist (dict)
+  (dict-reduce (lambda (alist k v)
+                 (acons k v alist))
+               dict
+               '()))
