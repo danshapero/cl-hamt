@@ -14,9 +14,9 @@
   ((hash
     :reader conflict-hash
     :initarg :hash)
-   (alist
-    :reader conflict-alist
-    :initarg :alist
+   (entries
+    :reader conflict-entries
+    :initarg :entries
     :initform '())))
 
 (defclass table-node ()
@@ -49,7 +49,7 @@
 
 (defmethod %hamt-lookup ((node conflict-node) key hash depth test)
   (declare (ignore hash depth))
-  (let ((key-val (assoc key (conflict-alist node) :test test)))
+  (let ((key-val (assoc key (conflict-entries node) :test test)))
     (if key-val
         (values (cdr key-val) t)
         (values nil nil))))
@@ -66,7 +66,7 @@
      sum (%hamt-size node)))
 
 (defmethod %hamt-size ((node conflict-node))
-  (length (conflict-alist node)))
+  (length (conflict-entries node)))
 
 
 ;; Methods for inserting key/value pairs into a HAMT
@@ -84,23 +84,23 @@
                        :value value)
         (make-instance 'conflict-node
                        :hash hash
-                       :alist (->> '()
-                                   (acons key value)
-                                   (acons nkey (node-value node)))))))
+                       :entries (->> '()
+                                     (acons key value)
+                                     (acons nkey (node-value node)))))))
 
 ;; Inserting into a conflict node either updates the value associated to an
 ;; existing key, or expands the scope of the conflict
 (defmethod %hamt-insert ((node conflict-node) key value hash depth test)
-  (let ((alist (conflict-alist node)))
+  (let ((entries (conflict-entries node)))
     (make-instance 'conflict-node
                    :hash hash
-                   :alist (if (assoc key alist)
-                              (mapcar (lambda (kv)
-                                        (if (funcall test (car kv) key)
-                                            (cons key value)
-                                            (cons (car kv) (cdr kv))))
-                                      alist)
-                              (acons key value alist)))))
+                   :entries (if (assoc key entries)
+                                (mapcar (lambda (kv)
+                                          (if (funcall test (car kv) key)
+                                              (cons key value)
+                                              (cons (car kv) (cdr kv))))
+                                        entries)
+                                (acons key value entries)))))
 
 (defmethod %hamt-insert ((node table-node) key value hash depth test)
   (let* ((bitmap (table-bitmap node))
@@ -145,19 +145,19 @@
 ;; collision. If there is now only 1 key with the given hash, we can
 ;; return a value-node, since there is no longer a collision.
 (defmethod %hamt-remove ((node conflict-node) key hash depth test)
-  (let ((alist (alist-remove key (conflict-alist node) test)))
-    (let ((len (length alist)))
+  (let ((entries (alist-remove key (conflict-entries node) test)))
+    (let ((len (length entries)))
       (cond
         ;; Can we get rid of this conditional branch? If the length of the
         ;; alist is 0, that means it used to be 1, but we should never have
         ;; had a conflict node with only 1 entry in the first place.
         ((= len 0) nil)
         ((= len 1) (make-instance 'value-node
-                                  :key (caar alist)
-                                  :value (cdar alist)))
+                                  :key (caar entries)
+                                  :value (cdar entries)))
         (t (make-instance 'conflict-node
                           :hash hash
-                          :alist alist))))))
+                          :entries entries))))))
 
 ;; Removing a key from a table node can mean updating its bitmap if there
 ;; is nothing left in the corresponding branch.
@@ -191,7 +191,7 @@
                  (f (cdr alist)
                     (funcall func r (caar alist) (cdar alist)))
                  r)))
-    (f (conflict-alist node) initial-value)))
+    (f (conflict-entries node) initial-value)))
 
 (defmethod dict-reduce (func (node table-node) initial-value)
   (reduce (lambda (r child)
