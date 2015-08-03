@@ -3,7 +3,7 @@
 (defpackage #:cl-hamt
   (:use #:cl #:yoda)
   (:export
-   ;; Generics for operating on dictionaries
+   ;; Functions for operating on dictionaries
    #:dict-lookup
    #:dict-insert
    #:dict-remove
@@ -12,6 +12,11 @@
    #:dict-map
    #:dict-filter
 
+   ;; Functions for operating on sets
+   #:set-lookup
+   #:set-insert
+   #:set-size
+
    ;; Utilities, conversion routines
    #:dict-reduce-keys
    #:dict-reduce-values
@@ -19,5 +24,7 @@
 
    ;; Hash array-mapped tries
    #:hash-dict
-   #:make-hash-dict))
+   #:make-hash-dict
+   #:hash-set
+   #:make-hash-set))
 
