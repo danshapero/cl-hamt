@@ -1,8 +1,8 @@
 
 (in-package :cl-hamt-test)
 
-(def-suite dictionary)
-(in-suite dictionary)
+(def-suite hash-dict-tests)
+(in-suite hash-dict-tests)
 
 (test empty-dict
   (is (not (dict-lookup (make-hash-dict) "hello"))))

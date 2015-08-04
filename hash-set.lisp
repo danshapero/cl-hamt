@@ -52,7 +52,6 @@
              (%set-insert (make-instance 'table-node)
                                          key
                                          hash
-                                         depth
                                          (1+ depth)
                                          test)))))
     (make-instance 'table-node

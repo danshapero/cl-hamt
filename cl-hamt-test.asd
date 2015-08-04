@@ -9,5 +9,6 @@
             :serial t
             :components
             ((:file "package")
-             (:file "cl-hamt-test")))))
+             (:file "hash-dict-test")
+             (:file "hash-set-test")))))
 
