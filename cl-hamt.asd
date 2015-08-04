@@ -7,5 +7,6 @@
   :serial t
   :components ((:file "package")
                (:file "util")
+               (:file "hamt")
                (:file "hash-dict")
                (:file "hash-set")))

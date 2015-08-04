@@ -15,6 +15,7 @@
    ;; Functions for operating on sets
    #:set-lookup
    #:set-insert
+   #:set-remove
    #:set-size
 
    ;; Utilities, conversion routines
