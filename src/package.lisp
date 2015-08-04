@@ -1,6 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:cl-hamt
+  (:nicknames :hamt)
   (:use #:cl #:yoda)
   (:export
    ;; Functions for operating on dictionaries

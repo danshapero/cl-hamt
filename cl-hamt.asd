@@ -5,8 +5,12 @@
   :license "BSD"
   :depends-on (#:yoda #:cl-murmurhash)
   :serial t
-  :components ((:file "package")
-               (:file "util")
-               (:file "hamt")
-               (:file "hash-dict")
-               (:file "hash-set")))
+  :components
+  ((:module "src"
+            :serial t
+            :components
+            ((:file "package")
+             (:file "util")
+             (:file "hamt")
+             (:file "hash-dict")
+             (:file "hash-set")))))
