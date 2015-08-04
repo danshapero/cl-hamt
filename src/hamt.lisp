@@ -81,3 +81,11 @@
                               :table (vec-remove array index))))))))
 
 
+;; Reducing over a HAMT is the same for table nodes of sets and dicts
+(defmethod %hamt-reduce (func node initial-value))
+
+(defmethod %hamt-reduce (func (node table) initial-value)
+  (reduce (lambda (r child)
+            (%hamt-reduce func child r))
+          (table-array node)
+          :initial-value initial-value))

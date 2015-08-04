@@ -18,6 +18,7 @@
    #:set-insert
    #:set-remove
    #:set-size
+   #:set-reduce
 
    ;; Utilities, conversion routines
    #:dict-reduce-keys

@@ -89,6 +89,16 @@
                         :entries entries)))))
 
 
+
+;; Methods for reducing over elements of hash-sets
+(defmethod %hamt-reduce (func (node set-leaf) initial-value)
+  (funcall func initial-value (node-key node)))
+
+(defmethod %hamt-reduce (func (node set-conflict) initial-value)
+  (reduce func (conflict-entries node) :initial-value initial-value))
+
+
+
 ;; Wrapper HAMT class
 (defclass hash-set ()
   ((test
@@ -138,3 +148,6 @@
                                       (funcall (hamt-hash s) key)
                                       0
                                       (hamt-test s))))
+
+(defun set-reduce (func s initial-value)
+  (%hamt-reduce func (hamt-table s) initial-value))

@@ -126,8 +126,6 @@
 
 
 ;; Methods for reducing over elements of HAMTs
-(defgeneric %hamt-reduce (func node initial-value))
-
 (defmethod %hamt-reduce (func (node dict-leaf) initial-value)
   (funcall func initial-value (node-key node) (node-value node)))
 
@@ -139,11 +137,6 @@
                  r)))
     (f (conflict-entries node) initial-value)))
 
-(defmethod %hamt-reduce (func (node dict-table) initial-value)
-  (reduce (lambda (r child)
-            (%hamt-reduce func child r))
-          (table-array node)
-          :initial-value initial-value))
 
 
 ;; Wrapper HAMT class
