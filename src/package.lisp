@@ -19,6 +19,7 @@
    #:set-remove
    #:set-size
    #:set-reduce
+   #:set-filter
 
    ;; Utilities, conversion routines
    #:dict-reduce-keys
