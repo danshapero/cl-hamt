@@ -53,3 +53,8 @@
 (test filtering
   (is-true (set-lookup hepcats-and-beboppers "Coleman Hawkins"))
   (is (= 1 (set-size hepcats-and-beboppers))))
+
+(test mapping
+  (is-true (set-lookup (set-map (lambda (k) (* k k))
+                                (integer-set 10))
+                       81)))

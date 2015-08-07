@@ -152,6 +152,14 @@
 (defun set-reduce (func s initial-value)
   (%hamt-reduce func (hamt-table s) initial-value))
 
+(defun set-map (func s)
+  (set-reduce (lambda (mapped-s k)
+                (set-insert mapped-s
+                            (funcall func k)))
+              s
+              (make-hash-set :test (hamt-test s)
+                             :hash (hamt-hash s))))
+
 (defun set-filter (predicate s)
   (set-reduce (lambda (filtered-s k)
                 (if (funcall predicate k)
