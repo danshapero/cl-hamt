@@ -44,3 +44,12 @@
 
 (test reducing
   (is (= 45 (set-reduce #'+ (integer-set 10) 0))))
+
+(defvar hepcats-and-beboppers
+  (set-filter (lambda (person)
+                (set-lookup beboppers person))
+              swinging-hepcats))
+
+(test filtering
+  (is-true (set-lookup hepcats-and-beboppers "Coleman Hawkins"))
+  (is (= 1 (set-size hepcats-and-beboppers))))
