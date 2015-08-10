@@ -168,3 +168,9 @@
               s
               (make-hash-set :test (hamt-test s)
                              :hash (hamt-hash s))))
+
+(defun set->list (s)
+  (set-reduce (lambda (lst k) (cons k lst))
+              s
+              '()))
+

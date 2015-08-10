@@ -26,6 +26,7 @@
    #:dict-reduce-keys
    #:dict-reduce-values
    #:dict->alist
+   #:set->list
 
    ;; Hash array-mapped tries
    #:hash-dict
