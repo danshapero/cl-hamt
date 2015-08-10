@@ -58,3 +58,33 @@
   (is-true (set-lookup (set-map (lambda (k) (* k k))
                                 (integer-set 10))
                        81)))
+
+
+;; These pairs of strings hash to the same number under murmurhash.
+(defvar some-word-collisions
+  '(("PSYCHOANALYZE" . "BEDUCKS")
+    ("PANSPERMIES" . "NONSELF")
+    ("UNSIGHING" . "TURBITS")))
+
+(defvar set-with-collisions
+  (reduce (lambda (s p)
+            (-> s
+                (set-insert (car p))
+                (set-insert (cdr p))))
+          some-word-collisions
+          :initial-value (make-hash-set :test #'equal
+                                        :hash #'cl-murmurhash:murmurhash)))
+
+(test collisions
+      (is (equal 6 (set-size set-with-collisions)))
+      (is-true (reduce (lambda (correct word)
+                         (and correct
+                              (set-lookup set-with-collisions
+                                          word)))
+                       '("PSYCHOANALYZE"
+                         "BEDUCKS"
+                         "PANSPERMIES"
+                         "NONSELF"
+                         "UNSIGHING"
+                         "TURBITS")
+                       :initial-value t)))

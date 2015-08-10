@@ -22,7 +22,7 @@
 
 (defmethod %hamt-lookup ((node set-conflict) key hash depth test)
   (declare (ignore hash depth))
-  (member key (conflict-entries node)))
+  (member key (conflict-entries node) :test test))
 
 
 
