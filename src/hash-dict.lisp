@@ -193,6 +193,22 @@
 (defun dict-reduce (func dict initial-value)
   (%hamt-reduce func (hamt-table dict) initial-value))
 
+(defun dict-clone (dict test hash)
+  (make-hash-dict :test (if test test (hamt-test dict))
+                  :hash (if hash hash (hamt-hash dict))))
+
+(defun dict-map-values (func dict &key test hash)
+  (dict-reduce (lambda (d k v)
+                 (dict-insert d k (funcall func v)))
+               dict
+               (dict-clone dict test hash)))
+
+(defun dict-map-keys (func dict &key test hash)
+  (dict-reduce (lambda (d k v)
+                 (dict-insert d (funcall func k) v))
+               dict
+               (dict-clone dict test hash)))
+
 (defun dict-filter (predicate dict)
   (dict-reduce (lambda (filtered-dict k v)
                  (if (funcall predicate k v)

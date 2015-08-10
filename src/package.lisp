@@ -10,7 +10,8 @@
    #:dict-remove
    #:dict-size
    #:dict-reduce
-   #:dict-map
+   #:dict-map-values
+   #:dict-map-keys
    #:dict-filter
 
    ;; Functions for operating on sets
