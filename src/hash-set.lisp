@@ -118,19 +118,23 @@
 (defun set-size (set)
   (%hamt-size (hamt-table set)))
 
-(defun set-insert (set x)
+(defun set-insert (set &rest xs)
   (with-hamt set (:test test :hash hash :table table)
-    (make-instance 'hash-set
-                   :test test
-                   :hash hash
-                   :table (%set-insert table x (funcall hash x) 0 test))))
+    (flet ((%insert (table x)
+             (%set-insert table x (funcall hash x) 0 test)))
+      (make-instance 'hash-set
+                     :test test
+                     :hash hash
+                     :table (reduce #'%insert xs :initial-value table)))))
 
-(defun set-remove (set x)
+(defun set-remove (set &rest xs)
   (with-hamt set (:test test :hash hash :table table)
-    (make-instance 'hash-set
-                   :test test
-                   :hash hash
-                   :table (%hamt-remove table x (funcall hash x) 0 test))))
+    (flet ((%remove (table x)
+             (%hamt-remove table x (funcall hash x) 0 test)))
+      (make-instance 'hash-set
+                     :test test
+                     :hash hash
+                     :table (reduce #'%remove xs :initial-value table)))))
 
 (defun set-reduce (func set initial-value)
   (%hamt-reduce func (hamt-table set) initial-value))

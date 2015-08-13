@@ -158,20 +158,31 @@
 (defun dict-size (dict)
   (%hamt-size (hamt-table dict)))
 
-(defun dict-insert (dict key value)
+(defun dict-insert (dict &rest args)
   (with-hamt dict (:test test :hash hash :table table)
-    (make-instance
-     'hash-dict
-     :test test
-     :hash hash
-     :table (%dict-insert table key value (funcall hash key) 0 test))))
+    (flet ((%insert (table key value)
+             (%dict-insert table key value (funcall hash key) 0 test)))
+      (make-instance
+       'hash-dict
+       :test test
+       :hash hash
+       :table (labels ((f (table args)
+                         (if args
+                             (let ((key (car args))
+                                   (value (cadr args)))
+                               (f (%insert table key value)
+                                  (cddr args)))
+                             table)))
+                (f table args))))))
 
-(defun dict-remove (dict key)
+(defun dict-remove (dict &rest keys)
   (with-hamt dict (:test test :hash hash :table table)
-    (make-instance 'hash-dict
-                   :test test
-                   :hash hash
-                   :table (%hamt-remove table key (funcall hash key) 0 test))))
+    (flet ((%remove (table key)
+             (%hamt-remove table key (funcall hash key) 0 test)))
+      (make-instance 'hash-dict
+                     :test test
+                     :hash hash
+                     :table (reduce #'%remove keys :initial-value table)))))
 
 (defun dict-reduce (func dict initial-value)
   (%hamt-reduce func (hamt-table dict) initial-value))
