@@ -140,21 +140,13 @@
 
 
 ;; Wrapper HAMT class
-(defclass hash-dict ()
-    ((test
-      :reader hamt-test
-      :initarg :test
-      :initform #'equal)
-     (hash
-      :reader hamt-hash
-      :initarg :hash
-      :initform #'cl-murmurhash:murmurhash)
-     (table
-      :reader hamt-table
-      :initarg :table
-      :initform (make-instance 'dict-table
-                               :bitmap 0
-                               :table (make-array 0)))))
+(defclass hash-dict (hamt)
+  ((table
+    :reader hamt-table
+    :initarg :table
+    :initform (make-instance 'dict-table
+                             :bitmap 0
+                             :table (make-array 0)))))
 
 (defun make-hash-dict (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
   (make-instance 'hash-dict :test test :hash hash))

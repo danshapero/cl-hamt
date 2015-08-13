@@ -27,6 +27,18 @@
     :initarg :table
     :initform (make-array 0 :initial-element nil))))
 
+(defclass hamt ()
+  ((test
+    :reader hamt-test
+    :initarg :test
+    :initform #'equal)
+   (hash
+    :reader hamt-hash
+    :initarg :hash
+    :initform #'cl-murmurhash:murmurhash)
+   (table
+    :reader hamt-table
+    :initarg :table)))
 
 ;; Getting the size of a HAMT
 (defgeneric %hamt-size (node))

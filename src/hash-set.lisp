@@ -100,16 +100,8 @@
 
 
 ;; Wrapper HAMT class
-(defclass hash-set ()
-  ((test
-    :reader hamt-test
-    :initarg :test
-    :initform #'equal)
-   (hash
-    :reader hamt-hash
-    :initarg :hash
-    :initform #'cl-murmurhash:murmurhash)
-   (table
+(defclass hash-set (hamt)
+  ((table
     :reader hamt-table
     :initarg :table
     :initform (make-instance 'set-table
