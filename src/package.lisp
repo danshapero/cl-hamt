@@ -1,7 +1,7 @@
 
 (defpackage #:cl-hamt
   (:nicknames :hamt)
-  (:use #:cl #:yoda)
+  (:use #:cl)
   (:export
    ;; Functions for operating on dictionaries
    #:dict-lookup

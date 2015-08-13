@@ -7,21 +7,21 @@
       (is (= 0 (set-size (make-hash-set)))))
 
 (defvar swinging-hepcats
-  (-> (make-hash-set)
-      (set-insert "Louis Armstrong")
-      (set-insert "Earl Hines")
-      (set-insert "Artie Shaw")
-      (set-insert "Count Basie")
-      (set-insert "Duke Ellington")
-      (set-insert "Coleman Hawkins")))
+  (set-insert (make-hash-set)
+              "Louis Armstrong"
+              "Earl Hines"
+              "Artie Shaw"
+              "Count Basie"
+              "Duke Ellington"
+              "Coleman Hawkins"))
 
 (defvar beboppers
-  (-> (make-hash-set)
-      (set-insert "Coleman Hawkins")
-      (set-insert "Charlie Parker")
-      (set-insert "Dizzy Gillespie")
-      (set-insert "Bud Powell")
-      (set-insert "Miles Davis")))
+  (set-insert (make-hash-set)
+              "Coleman Hawkins"
+              "Charlie Parker"
+              "Dizzy Gillespie"
+              "Bud Powell"
+              "Miles Davis"))
 
 (test inserting
   (is (= 6 (set-size swinging-hepcats)))
@@ -68,9 +68,7 @@
 
 (defvar set-with-collisions
   (reduce (lambda (s p)
-            (-> s
-                (set-insert (car p))
-                (set-insert (cdr p))))
+            (set-insert s (car p) (cdr p)))
           some-word-collisions
           :initial-value (make-hash-set :test #'equal
                                         :hash #'cl-murmurhash:murmurhash)))

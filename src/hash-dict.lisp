@@ -53,9 +53,11 @@
                        :value value)
         (make-instance 'dict-conflict
                        :hash hash
-                       :entries (->> '()
-                                     (acons key value)
-                                     (acons nkey (node-value node)))))))
+                       :entries (acons key
+                                       value
+                                       (acons nkey
+                                              (node-value node)
+                                              '()))))))
 
 ;; Inserting into a conflict node either updates the value associated to an
 ;; existing key, or expands the scope of the conflict

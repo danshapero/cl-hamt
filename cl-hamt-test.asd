@@ -1,8 +1,7 @@
 
 (asdf:defsystem #:cl-hamt-test
   :depends-on (#:cl-hamt
-               #:fiveam
-               #:yoda)
+               #:fiveam)
   :serial t
   :components
   ((:module "test"

@@ -8,12 +8,12 @@
   (is (not (dict-lookup (make-hash-dict) "hello"))))
 
 
-(defvar pacers (-> (make-hash-dict)
-                   (dict-insert "Reggie Miller" 2.01)
-                   (dict-insert "Larry Bird" 2.06)
-                   (dict-insert "Detlef Schrempf" 2.08)
-                   (dict-insert "Paul George" 2.01)
-                   (dict-insert "Metta World Peace" 2.01)))
+(defvar pacers (dict-insert (make-hash-dict)
+                            "Reggie Miller" 2.01
+                            "Larry Bird" 2.06
+                            "Detlef Schrempf" 2.08
+                            "Paul George" 2.01
+                            "Metta World Peace" 2.01))
 
 
 (test inserting
@@ -67,9 +67,9 @@
              (if word-pairs
                  (let ((word1 (caar word-pairs))
                        (word2 (cdar word-pairs)))
-                   (f (-> dict
-                          (dict-insert word1 word1)
-                          (dict-insert word2 word2))
+                   (f (dict-insert dict
+                                   word1 word1
+                                   word2 word2)
                       (cdr word-pairs)))
                  dict)))
     (f (make-hash-dict :test #'equal
