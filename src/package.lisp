@@ -1,4 +1,3 @@
-;;;; package.lisp
 
 (defpackage #:cl-hamt
   (:nicknames :hamt)

@@ -119,61 +119,61 @@
 (defun make-hash-set (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
   (make-instance 'hash-set :test test :hash hash))
 
-(defun set-lookup (s key)
-  (%hamt-lookup (hamt-table s)
-                key
-                (funcall (hamt-hash s) key)
+(defun set-lookup (set x)
+  (%hamt-lookup (hamt-table set)
+                x
+                (funcall (hamt-hash set) x)
                 0
-                (hamt-test s)))
+                (hamt-test set)))
 
-(defun set-size (s)
-  (%hamt-size (hamt-table s)))
+(defun set-size (set)
+  (%hamt-size (hamt-table set)))
 
-(defun set-insert (s key)
+(defun set-insert (set x)
   (make-instance 'hash-set
-                 :test (hamt-test s)
-                 :hash (hamt-hash s)
-                 :table (%set-insert (hamt-table s)
-                                     key
-                                     (funcall (hamt-hash s) key)
+                 :test (hamt-test set)
+                 :hash (hamt-hash set)
+                 :table (%set-insert (hamt-table set)
+                                     x
+                                     (funcall (hamt-hash set) x)
                                      0
-                                     (hamt-test s))))
+                                     (hamt-test set))))
 
-(defun set-remove (s key)
+(defun set-remove (set x)
   (make-instance 'hash-set
-                 :test (hamt-test s)
-                 :hash (hamt-hash s)
-                 :table (%hamt-remove (hamt-table s)
-                                      key
-                                      (funcall (hamt-hash s) key)
+                 :test (hamt-test set)
+                 :hash (hamt-hash set)
+                 :table (%hamt-remove (hamt-table set)
+                                      x
+                                      (funcall (hamt-hash set) x)
                                       0
-                                      (hamt-test s))))
+                                      (hamt-test set))))
 
-(defun set-reduce (func s initial-value)
-  (%hamt-reduce func (hamt-table s) initial-value))
+(defun set-reduce (func set initial-value)
+  (%hamt-reduce func (hamt-table set) initial-value))
 
-(defun set-map (func s
+(defun set-map (func set
                 &key
                   (test nil test-supplied-p)
                   (hash nil hash-supplied-p))
-  (set-reduce (lambda (mapped-s k)
-                (set-insert mapped-s
-                            (funcall func k)))
-              s
-              (make-hash-set :test (if test-supplied-p test (hamt-test s))
-                             :hash (if hash-supplied-p hash (hamt-hash s)))))
+  (set-reduce (lambda (mapped-set x)
+                (set-insert mapped-set
+                            (funcall func x)))
+              set
+              (make-hash-set :test (if test-supplied-p test (hamt-test set))
+                             :hash (if hash-supplied-p hash (hamt-hash set)))))
 
-(defun set-filter (predicate s)
-  (set-reduce (lambda (filtered-s k)
-                (if (funcall predicate k)
-                    (set-insert filtered-s k)
-                    filtered-s))
-              s
-              (make-hash-set :test (hamt-test s)
-                             :hash (hamt-hash s))))
+(defun set-filter (predicate set)
+  (set-reduce (lambda (filtered-set x)
+                (if (funcall predicate x)
+                    (set-insert filtered-set x)
+                    filtered-set))
+              set
+              (make-hash-set :test (hamt-test set)
+                             :hash (hamt-hash set))))
 
-(defun set->list (s)
-  (set-reduce (lambda (lst k) (cons k lst))
-              s
+(defun set->list (set)
+  (set-reduce (lambda (lst x) (cons x lst))
+              set
               '()))
 
