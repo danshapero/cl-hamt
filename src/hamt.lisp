@@ -27,6 +27,7 @@
     :initarg :table
     :initform (make-array 0 :initial-element nil))))
 
+;; Base HAMT class
 (defclass hamt ()
   ((test
     :reader hamt-test
@@ -39,6 +40,14 @@
    (table
     :reader hamt-table
     :initarg :table)))
+
+;; Convenience macro for accessing HAMT slots
+(defmacro with-hamt (hamt (&key test hash table) &body body)
+  `(with-accessors ((,test hamt-test)
+                    (,hash hamt-hash)
+                    (,table hamt-table))
+       ,hamt
+     ,@body))
 
 ;; Getting the size of a HAMT
 (defgeneric %hamt-size (node))

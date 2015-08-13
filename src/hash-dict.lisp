@@ -139,7 +139,7 @@
 
 
 
-;; Wrapper HAMT class
+;; Wrapper dictionary class
 (defclass hash-dict (hamt)
   ((table
     :reader hamt-table
@@ -152,35 +152,26 @@
   (make-instance 'hash-dict :test test :hash hash))
 
 (defun dict-lookup (dict key)
-  (%hamt-lookup (hamt-table dict)
-                key
-                (funcall (hamt-hash dict) key)
-                0
-                (hamt-test dict)))
+  (with-hamt dict (:test test :hash hash :table table)
+    (%hamt-lookup table key (funcall hash key) 0 test)))
 
 (defun dict-size (dict)
   (%hamt-size (hamt-table dict)))
 
 (defun dict-insert (dict key value)
-  (make-instance 'hash-dict
-                 :test (hamt-test dict)
-                 :hash (hamt-hash dict)
-                 :table (%dict-insert (hamt-table dict)
-                                      key
-                                      value
-                                      (funcall (hamt-hash dict) key)
-                                      0
-                                      (hamt-test dict))))
+  (with-hamt dict (:test test :hash hash :table table)
+    (make-instance
+     'hash-dict
+     :test test
+     :hash hash
+     :table (%dict-insert table key value (funcall hash key) 0 test))))
 
 (defun dict-remove (dict key)
-  (make-instance 'hash-dict
-                 :test (hamt-test dict)
-                 :hash (hamt-hash dict)
-                 :table (%hamt-remove (hamt-table dict)
-                                      key
-                                      (funcall (hamt-hash dict) key)
-                                      0
-                                      (hamt-test dict))))
+  (with-hamt dict (:test test :hash hash :table table)
+    (make-instance 'hash-dict
+                   :test test
+                   :hash hash
+                   :table (%hamt-remove table key (funcall hash key) 0 test))))
 
 (defun dict-reduce (func dict initial-value)
   (%hamt-reduce func (hamt-table dict) initial-value))

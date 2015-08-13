@@ -99,7 +99,7 @@
 
 
 
-;; Wrapper HAMT class
+;; Wrapper set class
 (defclass hash-set (hamt)
   ((table
     :reader hamt-table
@@ -112,34 +112,25 @@
   (make-instance 'hash-set :test test :hash hash))
 
 (defun set-lookup (set x)
-  (%hamt-lookup (hamt-table set)
-                x
-                (funcall (hamt-hash set) x)
-                0
-                (hamt-test set)))
+  (with-hamt set (:test test :hash hash :table table)
+    (%hamt-lookup table x (funcall hash x) 0 test)))
 
 (defun set-size (set)
   (%hamt-size (hamt-table set)))
 
 (defun set-insert (set x)
-  (make-instance 'hash-set
-                 :test (hamt-test set)
-                 :hash (hamt-hash set)
-                 :table (%set-insert (hamt-table set)
-                                     x
-                                     (funcall (hamt-hash set) x)
-                                     0
-                                     (hamt-test set))))
+  (with-hamt set (:test test :hash hash :table table)
+    (make-instance 'hash-set
+                   :test test
+                   :hash hash
+                   :table (%set-insert table x (funcall hash x) 0 test))))
 
 (defun set-remove (set x)
-  (make-instance 'hash-set
-                 :test (hamt-test set)
-                 :hash (hamt-hash set)
-                 :table (%hamt-remove (hamt-table set)
-                                      x
-                                      (funcall (hamt-hash set) x)
-                                      0
-                                      (hamt-test set))))
+  (with-hamt set (:test test :hash hash :table table)
+    (make-instance 'hash-set
+                   :test test
+                   :hash hash
+                   :table (%hamt-remove table x (funcall hash x) 0 test))))
 
 (defun set-reduce (func set initial-value)
   (%hamt-reduce func (hamt-table set) initial-value))
