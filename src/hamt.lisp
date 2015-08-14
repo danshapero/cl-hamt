@@ -21,7 +21,7 @@
     :reader table-bitmap
     :initarg :bitmap
     :initform 0
-    :type (unsigned-byte 5))
+    :type (unsigned-byte 32))
    (table
     :reader table-array
     :initarg :table
