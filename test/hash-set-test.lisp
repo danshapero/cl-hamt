@@ -74,8 +74,8 @@
                                     :hash #'cl-murmurhash:murmurhash)))
 
 (test collisions
-      (is (equal 6 (set-size set-with-collisions)))
-      (is-true (reduce (lambda (correct word)
+  (is (equal 6 (set-size set-with-collisions)))
+  (is-true (reduce (lambda (correct word)
                          (and correct
                               (set-lookup set-with-collisions
                                           word)))
@@ -85,4 +85,7 @@
                          "NONSELF"
                          "UNSIGHING"
                          "TURBITS")
-                       :initial-value t)))
+                       :initial-value t))
+  (is-true (set-lookup (set-remove set-with-collisions "PSYCHOANALYZE")
+                       "BEDUCKS"))
+  (is (= 5 (set-size (set-remove set-with-collisions "BEDUCKS")))))

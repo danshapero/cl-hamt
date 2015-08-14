@@ -112,18 +112,13 @@
 ;; return a dict-leaf, since there is no longer a collision.
 (defmethod %hamt-remove ((node dict-conflict) key hash depth test)
   (let ((entries (alist-remove key (conflict-entries node) test)))
-    (let ((len (length entries)))
-      (cond
-        ;; Can we get rid of this conditional branch? If the length of the
-        ;; alist is 0, that means it used to be 1, but we should never have
-        ;; had a conflict node with only 1 entry in the first place.
-        ((= len 0) nil)
-        ((= len 1) (make-instance 'dict-leaf
-                                  :key (caar entries)
-                                  :value (cdar entries)))
-        (t (make-instance 'dict-conflict
-                          :hash hash
-                          :entries entries))))))
+    (if (= (length entries) 1)
+        (make-instance 'dict-leaf
+                       :key (caar entries)
+                       :value (cdar entries))
+        (make-instance 'dict-conflict
+                       :hash hash
+                       :entries entries))))
 
 
 

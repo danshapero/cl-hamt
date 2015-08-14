@@ -78,15 +78,13 @@
 
 ;; Methods for removing items from a hash-set
 (defmethod %hamt-remove ((node set-conflict) key hash depth test)
-  (let* ((entries (remove key (conflict-entries node) :test test))
-         (len (length entries)))
-    (cond
-      ((= len 0) nil)
-      ((= len 1) (make-instance 'set-leaf
-                                :key (car entries)))
-      (t (make-instance 'set-conflict
-                        :hash hash
-                        :entries entries)))))
+  (let ((entries (remove key (conflict-entries node) :test test)))
+    (if (= (length entries) 1)
+        (make-instance 'set-leaf
+                       :key (car entries))
+        (make-instance 'set-conflict
+                       :hash hash
+                       :entries entries))))
 
 
 
