@@ -28,6 +28,12 @@
    #:dict->alist
    #:set->list
 
+   ;; Set theoretic operations
+   #:set-union
+   #:set-intersection
+   #:set-diff
+   #:set-symmetric-diff
+
    ;; Hash array-mapped tries
    #:hash-dict
    #:make-hash-dict

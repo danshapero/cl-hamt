@@ -164,3 +164,15 @@
               set
               '()))
 
+(defun set-union (set1 set2)
+  (set-reduce #'set-insert set1 set2))
+
+(defun set-intersection (set1 set2)
+  (set-filter (lambda (x) (set-lookup set1 x)) set2))
+
+(defun set-diff (set1 set2)
+  (set-reduce #'set-remove set2 set1))
+
+(defun set-symmetric-diff (set1 set2)
+  (set-diff (set-union set1 set2)
+            (set-intersection set1 set2)))
