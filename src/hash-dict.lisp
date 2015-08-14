@@ -150,7 +150,7 @@
                              :bitmap 0
                              :table (make-array 0)))))
 
-(defun make-hash-dict (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
+(defun empty-dict (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
   (make-instance 'hash-dict :test test :hash hash))
 
 (defun dict-lookup (dict key)
@@ -190,8 +190,8 @@
   (%hamt-reduce func (hamt-table dict) initial-value))
 
 (defun dict-clone (dict test hash)
-  (make-hash-dict :test (if test test (hamt-test dict))
-                  :hash (if hash hash (hamt-hash dict))))
+  (empty-dict :test (if test test (hamt-test dict))
+              :hash (if hash hash (hamt-hash dict))))
 
 (defun dict-map-values (func dict &key test hash)
   (dict-reduce (lambda (d k v)
@@ -211,8 +211,8 @@
                      (dict-insert filtered-dict k v)
                      filtered-dict))
                dict
-               (make-hash-dict :test (hamt-test dict)
-                               :hash (hamt-hash dict))))
+               (empty-dict :test (hamt-test dict)
+                           :hash (hamt-hash dict))))
 
 (defun dict-reduce-keys (func dict initial-value)
   (flet ((f (r k v)

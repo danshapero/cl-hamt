@@ -5,10 +5,10 @@
 (in-suite hash-dict-tests)
 
 (test empty-dict
-  (is (not (dict-lookup (make-hash-dict) "hello"))))
+  (is (not (dict-lookup (empty-dict) "hello"))))
 
 
-(defvar pacers (dict-insert (make-hash-dict)
+(defvar pacers (dict-insert (empty-dict)
                             "Reggie Miller" 2.01
                             "Larry Bird" 2.06
                             "Detlef Schrempf" 2.08
@@ -30,29 +30,22 @@
              (if (= i 16)
                  d
                  (f (dict-insert d i (* i i)) (1+ i)))))
-    (f (make-hash-dict) 0)))
+    (f (empty-dict) 0)))
 
 (test removing
   (is (= 16 (dict-size squares)))
   (is (= 16 (dict-lookup squares 4)))
-  (is (null (-> squares
-                (dict-remove 4)
-                (dict-lookup 4))))
+  (is-false (dict-lookup (dict-remove squares 4) 4))
   (is (= 15 (dict-size (dict-remove squares 4))))
-  (is (dict-lookup (dict-remove squares 4) 6))
-  (is (= 14 (-> squares
-                (dict-remove 4)
-                (dict-remove 12)
-                dict-size)))
-  (is (= 9 (-> squares
-               (dict-remove 4)
-               (dict-remove 12)
-               (dict-lookup 3))))
+  (is-true (dict-lookup (dict-remove squares 4) 6))
+  (is (= 14 (dict-size (dict-remove squares 4 12))))
+  (is (= 9 (dict-lookup (dict-remove squares 4 12) 3)))
 
   ;; Check that the data structure is persistent, i.e. a functional update
   ;; leaves the original HAMT intact
-  (is (= 16 (let ((fewer-squares (dict-remove squares 4)))
-              (dict-lookup squares 4)))))
+  (is-true (let ((fewer-squares (dict-remove squares 4)))
+             (and (= 16 (dict-lookup squares 4))
+                  (not (dict-lookup fewer-squares 4))))))
 
 
 ;; These pairs of strings hash to the same number under murmurhash.
@@ -72,8 +65,8 @@
                                    word2 word2)
                       (cdr word-pairs)))
                  dict)))
-    (f (make-hash-dict :test #'equal
-                       :hash #'cl-murmurhash:murmurhash)
+    (f (empty-dict :test #'equal
+                   :hash #'cl-murmurhash:murmurhash)
        some-word-collisions)))
 
 (test collisions

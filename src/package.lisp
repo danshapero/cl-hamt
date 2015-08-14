@@ -4,6 +4,7 @@
   (:use #:cl)
   (:export
    ;; Functions for operating on dictionaries
+   #:empty-dict
    #:dict-lookup
    #:dict-insert
    #:dict-remove
@@ -14,6 +15,7 @@
    #:dict-filter
 
    ;; Functions for operating on sets
+   #:empty-set
    #:set-lookup
    #:set-insert
    #:set-remove
@@ -36,7 +38,5 @@
 
    ;; Hash array-mapped tries
    #:hash-dict
-   #:make-hash-dict
-   #:hash-set
-   #:make-hash-set))
+   #:hash-set))
 

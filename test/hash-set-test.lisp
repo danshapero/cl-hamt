@@ -3,11 +3,11 @@
 (def-suite hash-set-tests)
 (in-suite hash-set-tests)
 
-(test empty-set
-      (is (= 0 (set-size (make-hash-set)))))
+(test empty
+      (is (= 0 (set-size (empty-set)))))
 
 (defvar swinging-hepcats
-  (set-insert (make-hash-set)
+  (set-insert (empty-set)
               "Louis Armstrong"
               "Earl Hines"
               "Artie Shaw"
@@ -16,7 +16,7 @@
               "Coleman Hawkins"))
 
 (defvar beboppers
-  (set-insert (make-hash-set)
+  (set-insert (empty-set)
               "Coleman Hawkins"
               "Charlie Parker"
               "Dizzy Gillespie"
@@ -40,7 +40,7 @@
              (if (= k n)
                  s
                  (f (set-insert s k) (1+ k)))))
-    (f (make-hash-set) 0)))
+    (f (empty-set) 0)))
 
 (test reducing
   (is (= 45 (set-reduce #'+ (integer-set 10) 0))))
@@ -70,8 +70,8 @@
   (reduce (lambda (s p)
             (set-insert s (car p) (cdr p)))
           some-word-collisions
-          :initial-value (make-hash-set :test #'equal
-                                        :hash #'cl-murmurhash:murmurhash)))
+          :initial-value (empty-set :test #'equal
+                                    :hash #'cl-murmurhash:murmurhash)))
 
 (test collisions
       (is (equal 6 (set-size set-with-collisions)))

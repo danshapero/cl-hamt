@@ -108,7 +108,7 @@
                              :bitmap 0
                              :table (make-array 0)))))
 
-(defun make-hash-set (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
+(defun empty-set (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
   (make-instance 'hash-set :test test :hash hash))
 
 (defun set-lookup (set x)
@@ -147,8 +147,8 @@
                 (set-insert mapped-set
                             (funcall func x)))
               set
-              (make-hash-set :test (if test-supplied-p test (hamt-test set))
-                             :hash (if hash-supplied-p hash (hamt-hash set)))))
+              (empty-set :test (if test-supplied-p test (hamt-test set))
+                         :hash (if hash-supplied-p hash (hamt-hash set)))))
 
 (defun set-filter (predicate set)
   (set-reduce (lambda (filtered-set x)
@@ -156,8 +156,8 @@
                     (set-insert filtered-set x)
                     filtered-set))
               set
-              (make-hash-set :test (hamt-test set)
-                             :hash (hamt-hash set))))
+              (empty-set :test (hamt-test set)
+                         :hash (hamt-hash set))))
 
 (defun set->list (set)
   (set-reduce (lambda (lst x) (cons x lst))
