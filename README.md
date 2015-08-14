@@ -1,6 +1,8 @@
 cl-hamt
 =======
 
+[![Build Status](https://travis-ci.org/danshapero/cl-hamt.svg?branch=master)](https://travis-ci.org/danshapero/cl-hamt)
+
 This library provides persistent dictionaries and sets in Common Lisp, based on the hash array-mapped trie (HAMT) data structure as found in Clojure.
 
 The operations provided are:
