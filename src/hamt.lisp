@@ -41,13 +41,26 @@
     :reader hamt-table
     :initarg :table)))
 
-;; Convenience macro for accessing HAMT slots
+
 (defmacro with-hamt (hamt (&key test hash table) &body body)
+  "Accessing HAMT slots"
   `(with-accessors ((,test hamt-test)
                     (,hash hamt-hash)
                     (,table hamt-table))
        ,hamt
      ,@body))
+
+(defmacro with-table (node hash depth
+                      (bitmap array bits index hit)
+                      &body body)
+  "Bitshifting in HAMT tables"
+  `(let* ((,bitmap (table-bitmap ,node))
+          (,array (table-array ,node))
+          (,bits (get-bits ,hash ,depth))
+          (,index (get-index ,bits ,bitmap))
+          (,hit (logbitp ,bits ,bitmap)))
+     ,@body))
+
 
 ;; Getting the size of a HAMT
 (defgeneric %hamt-size (node))
@@ -83,14 +96,12 @@
 ;; Removing a key from a table node can mean updating its bitmap if there
 ;; is nothing left in the corresponding branch.
 (defmethod %hamt-remove ((node table) key hash depth test)
-  (let* ((bitmap (table-bitmap node))
-         (array (table-array node))
-         (bits (get-bits hash depth))
-         (index (get-index bits bitmap))
-         (hit (logbitp bits bitmap)))
+  (with-table node hash depth
+      (bitmap array bits index hit)
     (if (not hit)
         node
-        (let ((new-node (%hamt-remove (aref array index) key hash (1+ depth) test)))
+        (let ((new-node
+                (%hamt-remove (aref array index) key hash (1+ depth) test)))
           (cond
             (new-node
              (make-instance (type-of node)

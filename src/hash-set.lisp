@@ -13,12 +13,10 @@
   (funcall test (node-key node) key))
 
 (defmethod %hamt-lookup ((node set-table) key hash depth test)
-  (let ((bitmap (table-bitmap node))
-        (bits (get-bits hash depth)))
-    (if (logbitp bits bitmap)
-        (let ((index (get-index bits bitmap)))
-          (%hamt-lookup (aref (table-array node) index) key hash (1+ depth) test))
-        nil)))
+  (with-table node hash depth
+      (bitmap array bits index hit)
+    (when hit
+      (%hamt-lookup (aref array index) key hash (1+ depth) test))))
 
 (defmethod %hamt-lookup ((node set-conflict) key hash depth test)
   (declare (ignore hash depth))
@@ -50,29 +48,21 @@
                                 (cons key entries)))))
 
 (defmethod %set-insert ((node set-table) key hash depth test)
-  (let* ((bitmap (table-bitmap node))
-         (array (table-array node))
-         (bits (get-bits hash depth))
-         (index (get-index bits bitmap))
-         (hit (logbitp bits bitmap))
-         (new-node
-          (cond
-            (hit
-             (%set-insert (aref array index) key hash (1+ depth) test))
-            ((= depth 6)
-             (make-instance 'set-leaf :key key))
-            (t
-             (%set-insert (make-instance 'set-table)
-                                         key
-                                         hash
-                                         (1+ depth)
-                                         test)))))
-    (make-instance 'set-table
-                   :bitmap (logior bitmap (ash 1 bits))
-                   :table (funcall (if hit #'vec-update #'vec-insert)
-                                   array
-                                   index
-                                   new-node))))
+  (with-table node hash depth
+      (bitmap array bits index hit)
+    (flet ((%insert (table)
+             (%set-insert table key hash (1+ depth) test)))
+      (let ((new-node
+              (cond
+                (hit (%insert (aref array index)))
+                ((= depth 6) (make-instance 'set-leaf :key key))
+                (t (%insert (make-instance 'set-table))))))
+        (make-instance 'set-table
+                       :bitmap (logior bitmap (ash 1 bits))
+                       :table (funcall (if hit #'vec-update #'vec-insert)
+                                       array
+                                       index
+                                       new-node))))))
 
 
 
