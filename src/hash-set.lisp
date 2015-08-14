@@ -109,16 +109,22 @@
                              :table (make-array 0)))))
 
 (defun empty-set (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
+  "Return an empty hash-set, in which elements will be compared and hashed
+with the supplied test and hash functions. The hash must be a 32-bit hash."
   (make-instance 'hash-set :test test :hash hash))
 
 (defun set-lookup (set x)
+  "Return true if the object x is in the set, false otherwise"
   (with-hamt set (:test test :hash hash :table table)
     (%hamt-lookup table x (funcall hash x) 0 test)))
 
 (defun set-size (set)
+  "Return the size of the set"
   (%hamt-size (hamt-table set)))
 
 (defun set-insert (set &rest xs)
+  "Return a new set with the elements xs added to it. Elements already in
+the set are ignored."
   (with-hamt set (:test test :hash hash :table table)
     (flet ((%insert (table x)
              (%set-insert table x (funcall hash x) 0 test)))
@@ -128,6 +134,8 @@
                      :table (reduce #'%insert xs :initial-value table)))))
 
 (defun set-remove (set &rest xs)
+  "Return a new set with the elements xs removed from it. If an item x in
+xs is not in the set, it is ignored."
   (with-hamt set (:test test :hash hash :table table)
     (flet ((%remove (table x)
              (%hamt-remove table x (funcall hash x) 0 test)))
@@ -137,12 +145,20 @@
                      :table (reduce #'%remove xs :initial-value table)))))
 
 (defun set-reduce (func set initial-value)
+  "Successively apply a function to elements of the set. The function is
+assumed to have the signature
+  `func :: A B -> A`,
+where A is the type of `initial-value` and `B` is the type of set elements.
+Note that HAMTs do not store items in any order, so the reduction operation
+cannot be sensitive to the order in which the items are reduced."
   (%hamt-reduce func (hamt-table set) initial-value))
 
 (defun set-map (func set
                 &key
                   (test nil test-supplied-p)
                   (hash nil hash-supplied-p))
+  "Return the image of a set under a given function. Optionally use new
+comparison and hash functions for the mapped set."
   (set-reduce (lambda (mapped-set x)
                 (set-insert mapped-set
                             (funcall func x)))
@@ -151,6 +167,7 @@
                          :hash (if hash-supplied-p hash (hamt-hash set)))))
 
 (defun set-filter (predicate set)
+  "Return the elements of the set satisfying a given predicate."
   (set-reduce (lambda (filtered-set x)
                 (if (funcall predicate x)
                     (set-insert filtered-set x)

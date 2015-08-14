@@ -151,16 +151,28 @@
                              :table (make-array 0)))))
 
 (defun empty-dict (&key (test #'equal) (hash #'cl-murmurhash:murmurhash))
+  "Return an empty hash-dict, in which keys will be compared and hashed
+with the supplied test and hash functions. The hash must be a 32-bit hash."
   (make-instance 'hash-dict :test test :hash hash))
 
 (defun dict-lookup (dict key)
+  "Multiply-return the value mapped to by the key in the dictionary and
+whether or not the value is present in the dictionary.
+The multiple return is necessary in case a key is present but maps to nil."
   (with-hamt dict (:test test :hash hash :table table)
     (%hamt-lookup table key (funcall hash key) 0 test)))
 
 (defun dict-size (dict)
+  "Return the number of key/value pairs in the dict"
   (%hamt-size (hamt-table dict)))
 
 (defun dict-insert (dict &rest args)
+  "Return a new dictionary with the key/value pairs added. The key/value
+pairs are assumed to be alternating in the &rest argument, so to add the
+key/value pairs (k1, v1), ..., (kn, vn), one would invoke
+  (dict-insert dict k1 v1 ... kn vn).
+If any of the keys are already present in the dict passed, they are mapped
+to the new values in the returned dict."
   (with-hamt dict (:test test :hash hash :table table)
     (flet ((%insert (table key value)
              (%dict-insert table key value (funcall hash key) 0 test)))
@@ -178,6 +190,8 @@
                 (f table args))))))
 
 (defun dict-remove (dict &rest keys)
+  "Return a new dict with the keys removed. Any keys passed that are not
+already present in the dict are ignored."
   (with-hamt dict (:test test :hash hash :table table)
     (flet ((%remove (table key)
              (%hamt-remove table key (funcall hash key) 0 test)))
@@ -187,6 +201,13 @@
                      :table (reduce #'%remove keys :initial-value table)))))
 
 (defun dict-reduce (func dict initial-value)
+  "Successively apply a function to key/value pairs of the dict.
+The function is assumed to have the signature
+   `func :: A K V -> A`,
+where `A` is the type of the initial-value, `K` is the type of the dict
+keys and `V` is the type of dictionary values.
+Note that HAMTs do not store items in any order, so the reduction operation
+cannot be sensitive to the order in which the items are reduced."
   (%hamt-reduce func (hamt-table dict) initial-value))
 
 (defun dict-clone (dict test hash)
@@ -194,18 +215,23 @@
               :hash (if hash hash (hamt-hash dict))))
 
 (defun dict-map-values (func dict &key test hash)
+  "Return a new dict with the values mapped by the given function.
+Optionally use new comparison and hash functions for the mapped dict."
   (dict-reduce (lambda (d k v)
                  (dict-insert d k (funcall func v)))
                dict
                (dict-clone dict test hash)))
 
 (defun dict-map-keys (func dict &key test hash)
+  "Return a new dict with the keys mapped by the given function."
   (dict-reduce (lambda (d k v)
                  (dict-insert d (funcall func k) v))
                dict
                (dict-clone dict test hash)))
 
 (defun dict-filter (predicate dict)
+  "Return a new dict consisting of the key/value pairs satisfying the
+given predicate."
   (dict-reduce (lambda (filtered-dict k v)
                  (if (funcall predicate k v)
                      (dict-insert filtered-dict k v)
@@ -215,12 +241,14 @@
                            :hash (hamt-hash dict))))
 
 (defun dict-reduce-keys (func dict initial-value)
+  "Reducing over dictionary keys, ignoring the values."
   (flet ((f (r k v)
            (declare (ignore v))
            (funcall func r k)))
     (dict-reduce #'f dict initial-value)))
 
 (defun dict-reduce-values (func dict initial-value)
+  "Reducing over dictionary values, ignoring the keys."
   (flet ((f (r k v)
            (declare (ignore k))
            (funcall func r v)))
