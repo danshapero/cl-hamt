@@ -9,5 +9,6 @@
             :components
             ((:file "package")
              (:file "hash-dict-test")
-             (:file "hash-set-test")))))
+             (:file "hash-set-test")
+             (:file "benchmarks")))))
 
