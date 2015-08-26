@@ -169,14 +169,20 @@ comparison and hash functions for the mapped set."
               set
               '()))
 
-(defun set-union (set1 set2)
-  (set-reduce #'set-insert set1 set2))
+(defun set-union (set &rest args)
+  (reduce (lambda (set1 set2)
+            (set-reduce #'set-insert set1 set2))
+          args :initial-value set))
 
-(defun set-intersection (set1 set2)
-  (set-filter (lambda (x) (set-lookup set1 x)) set2))
+(defun set-intersection (set &rest args)
+  (reduce (lambda (set1 set2)
+            (set-filter (lambda (x) (set-lookup set1 x)) set2))
+          args :initial-value set))
 
-(defun set-diff (set1 set2)
-  (set-reduce #'set-remove set2 set1))
+(defun set-diff (set &rest args)
+  (reduce (lambda (set1 set2)
+            (set-reduce #'set-remove set2 set1))
+          args :initial-value set))
 
 (defun set-symmetric-diff (set1 set2)
   (set-diff (set-union set1 set2)
