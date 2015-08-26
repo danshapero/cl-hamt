@@ -1,3 +1,4 @@
 
 (defpackage #:cl-hamt-examples
-  (:use #:cl #:cl-hamt))
+  (:use #:cl #:cl-hamt)
+  (:export #:word-frequency))

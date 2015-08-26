@@ -1,7 +1,9 @@
 
 (asdf:defsystem #:cl-hamt-examples
   :depends-on (#:cl-hamt
-               #:split-sequence)
+               #:cl-ppcre
+               #:drakma)
   :serial t
   :components
-  ((:file "package")))
+  ((:file "package")
+   (:file "lexicon")))
