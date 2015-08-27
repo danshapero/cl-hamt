@@ -20,7 +20,7 @@ from the online database."
 ;; Dictionary of each corpus mapping its name to the set of words
 (defvar corpora
   (reduce (lambda (dict corpus)
-            (dict-insert dict (fetch-corpus corpus)))
+            (dict-insert dict corpus (fetch-corpus corpus)))
           '("enron" "kos" "nips" "nytimes" "pubmed")
           :initial-value (empty-dict)))
 
