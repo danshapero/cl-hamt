@@ -43,7 +43,7 @@
   (let ((entries (conflict-entries node)))
     (make-instance 'set-conflict
                    :hash hash
-                   :entries (if (member key entries :key test)
+                   :entries (if (member key entries :test test)
                                 entries
                                 (cons key entries)))))
 
