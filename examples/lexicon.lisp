@@ -26,4 +26,4 @@ from the online database."
 
 ;; How many words are common to every corpus?
 (defvar common-words
-  (dict-reduce-values #'set-intersection corpora (empty-set)))
+  (dict-reduce-values #'set-intersection corpora (dict-lookup corpora "kos")))
