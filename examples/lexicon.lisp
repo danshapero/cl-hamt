@@ -1,20 +1,29 @@
 
 (in-package :cl-hamt-examples)
 
-(defvar prince-uri
-  "http://www.gutenberg.org/cache/epub/1232/pg1232.txt")
+(defvar ml-databases-uri
+  "https://archive.ics.uci.edu/ml/machine-learning-databases/")
 
-(defvar discourses-uri
-  "http://www.gutenberg.org/cache/epub/10827/pg10827.txt")
+(defvar bag-of-words-uri
+  (concatenate 'string ml-databases-uri "bag-of-words/"))
 
-(defun add-word (dict word)
-  (multiple-value-bind (count foundp)
-      (dict-lookup dict word)
-    (dict-insert dict word (if foundp (1+ count) 0))))
+(defun fetch-corpus (corpus)
+  "Given the name of a corpus, fetch the corresponding bag of words
+from the online database."
+  (let* ((uri (concatenate 'string
+                           bag-of-words-uri "vocab." corpus ".txt"))
+         (text (drakma:http-request uri)))
+    (reduce #'set-insert
+            (cl-ppcre:all-matches-as-strings "\\w+" text)
+            :initial-value (empty-set))))
 
-(defun word-frequency (text)
-  (dict-filter (lambda (word count)
-                 (and (> count 1) (> (length word 1))))
-               (reduce #'add-word
-                       (cl-ppcre:all-matches-as-strings "\\w+" text)
-                       :initial-value (empty-dict))))
+;; Dictionary of each corpus mapping its name to the set of words
+(defvar corpora
+  (reduce (lambda (dict corpus)
+            (dict-insert dict (fetch-corpus corpus)))
+          '("enron" "kos" "nips" "nytimes" "pubmed")
+          :initial-value (empty-dict)))
+
+;; How many words are common to every corpus?
+(defvar common-words
+  (dict-reduce-values #'set-intersection corpora (empty-set)))
