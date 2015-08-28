@@ -17,13 +17,16 @@ from the online database."
             (cl-ppcre:all-matches-as-strings "\\w+" text)
             :initial-value (empty-set))))
 
-;; Dictionary of each corpus mapping its name to the set of words
-(defvar corpora
+(defun fetch-corpora ()
+  "Fetch all the word bags from UCI's database."
   (reduce (lambda (dict corpus)
             (dict-insert dict corpus (fetch-corpus corpus)))
           '("enron" "kos" "nips" "nytimes" "pubmed")
           :initial-value (empty-dict)))
 
-;; How many words are common to every corpus?
-(defvar common-words
-  (dict-reduce-values #'set-intersection corpora (dict-lookup corpora "kos")))
+(defun common-words ()
+  "Return a set of words that are found in every corpus"
+  (let ((corpora (fetch-corpora)))
+    (dict-reduce-values #'set-intersection
+                        corpora
+                        (dict-lookup corpora "kos"))))
