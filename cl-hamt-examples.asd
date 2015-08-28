@@ -1,5 +1,8 @@
 
 (asdf:defsystem #:cl-hamt-examples
+  :description "Example code for using cl-hamt"
+  :author "Daniel Shapero <shapero.daniel@gmail.com>"
+  :license "BSD"
   :depends-on (#:cl-hamt
                #:cl-ppcre
                #:drakma)

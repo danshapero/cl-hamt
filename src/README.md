@@ -1,5 +1,5 @@
 
-## A word on the implementation
+## A word on the code organization
 
 The `hash-dict` and `hash-set` data structures that the user will see are wrappers around classes for the trie's nodes.
 There are three types of trie nodes: leaves, which store the actual data; table nodes, which store a bitmap and array to index the key hashes; and conflict nodes, which are like leaves in the event of a hash collision.
