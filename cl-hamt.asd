@@ -7,10 +7,10 @@
   :serial t
   :components
   ((:module "src"
-            :serial t
-            :components
-            ((:file "package")
-             (:file "util")
-             (:file "hamt")
-             (:file "hash-dict")
-             (:file "hash-set")))))
+    :serial t
+    :components
+    ((:file "package")
+     (:file "util")
+     (:file "hamt")
+     (:file "hash-dict")
+     (:file "hash-set")))))

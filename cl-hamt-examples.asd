@@ -5,5 +5,8 @@
                #:drakma)
   :serial t
   :components
-  ((:file "package")
-   (:file "lexicon")))
+  ((:module "examples"
+    :serial t
+    :components
+    ((:file "package")
+     (:file "lexicon")))))
