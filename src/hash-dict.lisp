@@ -1,4 +1,4 @@
-(in-package :cl-hamt)
+(in-package #:cl-hamt)
 
 ;; Leaves in a dictionary also store the value contained at the node, as well
 ;; as a key

@@ -1,4 +1,4 @@
-(in-package :cl-hamt)
+(in-package #:cl-hamt)
 
 ;; Utility functions for operating on HAMTs.
 

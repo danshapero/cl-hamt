@@ -1,6 +1,6 @@
 
 (defpackage #:cl-hamt
-  (:nicknames :hamt)
+  (:nicknames #:hamt)
   (:use #:cl)
   (:export
    ;; Functions for operating on dictionaries

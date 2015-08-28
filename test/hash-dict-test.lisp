@@ -1,5 +1,5 @@
 
-(in-package :cl-hamt-test)
+(in-package #:cl-hamt-test)
 
 (def-suite hash-dict-tests)
 (in-suite hash-dict-tests)

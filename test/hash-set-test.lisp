@@ -1,4 +1,4 @@
-(in-package :cl-hamt-test)
+(in-package #:cl-hamt-test)
 
 (def-suite hash-set-tests)
 (in-suite hash-set-tests)

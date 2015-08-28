@@ -1,5 +1,5 @@
 
-(in-package :cl-hamt-examples)
+(in-package #:cl-hamt-examples)
 
 (defvar ml-databases-uri
   "https://archive.ics.uci.edu/ml/machine-learning-databases/")

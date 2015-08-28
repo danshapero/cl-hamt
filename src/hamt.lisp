@@ -1,5 +1,5 @@
 
-(in-package :cl-hamt)
+(in-package #:cl-hamt)
 
 (defclass leaf ()
   ((key
@@ -87,9 +87,8 @@
 
 (defmethod %hamt-remove ((node leaf) key hash depth test)
   (let ((nkey (node-key node)))
-    (if (funcall test key nkey)
-        nil
-        node)))
+    (unless (funcall test key nkey)
+      node)))
 
 ;; Removing entries from a conflict node differs for sets and dicts
 

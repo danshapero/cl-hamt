@@ -1,4 +1,4 @@
-(in-package :cl-hamt)
+(in-package #:cl-hamt)
 
 (defclass set-leaf (leaf) ())
 

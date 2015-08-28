@@ -1,5 +1,5 @@
 
-(in-package :cl-hamt-test)
+(in-package #:cl-hamt-test)
 
 (defvar state (make-random-state t))
 
