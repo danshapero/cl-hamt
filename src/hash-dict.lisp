@@ -246,3 +246,51 @@ given predicate."
                  (acons k v alist))
                dict
                '()))
+
+;; Methods for deciding if two dictionaries are equal
+(defgeneric %hash-dict-eq (dict1 dict2 key-test value-test))
+
+(defmethod %hash-dict-eq (dict1 dict2 key-test value-test)
+  (declare (ignore dict1 dict2 key-test value-test))
+  nil)
+
+(defmethod %hash-dict-eq ((node1 dict-leaf)
+                          (node2 dict-leaf)
+                          key-test
+                          value-test)
+  (and (funcall key-test (node-key node1) (node-key node2))
+       (funcall value-test (node-value node1) (node-value node2))))
+
+
+(defmethod %hash-dict-eq ((node1 dict-conflict)
+                          (node2 dict-conflict)
+                          key-test
+                          value-test)
+  (and (equal (conflict-hash node1) (conflict-hash node2))
+       (labels ((alist-eq (alist1 alist2)
+                  (if (or (not alist1) (not alist2))
+                      (and (not alist1) (not alist2))
+                      (let ((key1 (caar alist1))
+                            (key2 (caar alist2))
+                            (value1 (cdar alist1))
+                            (value2 (cdar alist2)))
+                        (when (and (funcall key-test key1 key2)
+                                   (funcall value-test value1 value2))
+                            (alist-eq (cdr alist1) (cdr alist2)))))))
+         (alist-eq (conflict-entries node1) (conflict-entries node2)))))
+
+(defmethod %hash-dict-eq ((node1 dict-table)
+                          (node2 dict-table)
+                          key-test
+                          value-test)
+  (and (equal (table-bitmap node1) (table-bitmap node2))
+       (array-eq (table-array node1)
+                 (table-array node2)
+                 (lambda (dict1 dict2)
+                   (%hash-dict-eq dict1 dict2 key-test value-test)))))
+
+(defun dict-eq (dict1 dict2 &key (value-test #'equal))
+  (let ((test1 (hamt-test dict1)))
+    (if (not (eq test1 (hamt-test dict2)))
+        (error 'incompatible-tests-error)
+        (%hash-dict-eq (hamt-table dict1) (hamt-table dict2) test1 value-test))))

@@ -120,3 +120,16 @@
             (%hamt-reduce func child r))
           (table-array node)
           :initial-value initial-value))
+
+;; Helpers for defining equality between hash sets/dictionaries
+(define-condition incompatible-tests-error (error)
+  ())
+
+(defun array-eq (arr1 arr2 test)
+  (let ((n (length arr1)))
+    (if (not (= n (length arr2)))
+        nil
+        (do ((i 0 (+ i 1)))
+            ((or (= i n)
+                 (not (funcall test (elt arr1 i) (elt arr2 i))))
+             (= i n))))))

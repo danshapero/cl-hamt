@@ -187,3 +187,31 @@ comparison and hash functions for the mapped set."
 (defun set-symmetric-diff (set1 set2)
   (set-diff (set-union set1 set2)
             (set-intersection set1 set2)))
+
+
+;; Methods for deciding if two sets are equal
+(defgeneric %hash-set-eq (set1 set2 test))
+
+(defmethod %hash-set-eq (node1 node2 test)
+  (declare (ignore node1 node2 test))
+  nil)
+
+(defmethod %hash-set-eq ((node1 set-leaf) (node2 set-leaf) test)
+  (funcall test (node-key node1) (node-key node2)))
+
+(defmethod %hash-set-eq ((node1 set-conflict) (node2 set-conflict) test)
+  (and (equal (conflict-hash node1) (conflict-hash node2))
+       (tree-equal (conflict-entries node1) (conflict-entries node2) :test test)))
+
+(defmethod %hash-set-eq ((node1 set-table) (node2 set-table) test)
+  (and (equal (table-bitmap node1) (table-bitmap node2))
+       (array-eq (table-array node1)
+                 (table-array node2)
+                 (lambda (set1 set2)
+                   (%hash-set-eq set1 set2 test)))))
+
+(defun set-eq (set1 set2)
+  (let ((test1 (hamt-test set1)))
+    (if (not (eq test1 (hamt-test set2)))
+        (error 'incompatible-tests-error)
+        (%hash-set-eq (hamt-table set1) (hamt-table set2) test1))))

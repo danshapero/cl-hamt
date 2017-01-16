@@ -89,3 +89,26 @@
   (is-true (set-lookup (set-remove set-with-collisions "PSYCHOANALYZE")
                        "BEDUCKS"))
   (is (= 5 (set-size (set-remove set-with-collisions "BEDUCKS")))))
+
+(defvar some-numbers
+  (loop for i from 0 to 100 collecting (random 1000)))
+
+(defvar set-without-collisions
+  (reduce (lambda (s p)
+            (set-insert s (car p)))
+          some-word-collisions
+          :initial-value (empty-set :test #'equal
+                                    :hash #'cl-murmurhash:murmurhash)))
+
+(test set-equality
+  (is-false (set-eq swinging-hepcats beboppers))
+  (is-true (set-eq (set-union swinging-hepcats beboppers)
+                   (set-union beboppers swinging-hepcats)))
+  (is-true (set-eq set-with-collisions set-with-collisions))
+  (is-true (let ((set1 (apply #'set-insert (cons (empty-set) some-numbers)))
+                 (set2 (apply #'set-insert (cons (empty-set) some-numbers))))
+             (and (not (eq set1 set2))
+                  (set-eq set1 set2))))
+  (is-false (set-eq (apply 'set-insert (cons (empty-set) some-numbers))
+                    (apply 'set-insert (cons (empty-set) (cdr some-numbers)))))
+  (is-false (set-eq set-with-collisions set-without-collisions)))

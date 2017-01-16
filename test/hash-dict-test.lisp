@@ -131,3 +131,30 @@
   (is-true (dict-lookup tall-pacers "Larry Bird"))
   (is-true (dict-lookup tall-pacers "Detlef Schrempf"))
   (is-false (dict-lookup tall-pacers "Reggie Miller")))
+
+
+(defvar capital-dict
+  (dict-insert (empty-dict)
+               "Alonzo Church" "LOGIC"
+               "Sergei Sobolev" "PDE"))
+
+(defvar lowercase-dict
+  (dict-insert (empty-dict)
+               "Alonzo Church" "logic"
+               "Sergei Sobolev" "pde"))
+
+(defvar some-numbers
+  (loop for i from 1 to 100 collect (random 1000)))
+
+(test dict-equality
+  (is-true (dict-eq pacers pacers))
+  (is-false (dict-eq pacers (dict-remove pacers "Larry Bird")))
+  (is-false (dict-eq pacers (dict-insert pacers "Jonathan Bender" 2.13)))
+  (is-false (dict-eq dict-with-collisions
+                     (dict-remove dict-with-collisions "PSYCHOANALYZE")))
+  (is-true (dict-eq capital-dict lowercase-dict :value-test #'equalp))
+  (is-false (dict-eq capital-dict lowercase-dict :value-test #'equal))
+  (is-true (let ((dict1 (apply #'dict-insert (cons (empty-dict) some-numbers)))
+                 (dict2 (apply #'dict-insert (cons (empty-dict) some-numbers))))
+             (and (not (eq dict1 dict2))
+                  (dict-eq dict1 dict2)))))

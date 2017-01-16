@@ -13,6 +13,7 @@
    #:dict-map-values
    #:dict-map-keys
    #:dict-filter
+   #:dict-eq
 
    ;; Functions for operating on sets
    #:empty-set
@@ -23,6 +24,7 @@
    #:set-reduce
    #:set-map
    #:set-filter
+   #:set-eq
 
    ;; Utilities, conversion routines
    #:dict-reduce-keys
@@ -38,5 +40,8 @@
 
    ;; Hash array-mapped tries
    #:hash-dict
-   #:hash-set))
+   #:hash-set
 
+   ;; Conditions
+   #:incompatible-tests
+   ))
