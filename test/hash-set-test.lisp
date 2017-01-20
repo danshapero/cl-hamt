@@ -111,4 +111,5 @@
                   (set-eq set1 set2))))
   (is-false (set-eq (apply 'set-insert (cons (empty-set) some-numbers))
                     (apply 'set-insert (cons (empty-set) (cdr some-numbers)))))
-  (is-false (set-eq set-with-collisions set-without-collisions)))
+  (is-false (set-eq set-with-collisions set-without-collisions))
+  (is-true (set-eq (empty-set :test 'equal) (empty-set :test #'equal))))

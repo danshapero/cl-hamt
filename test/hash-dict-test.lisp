@@ -157,4 +157,5 @@
   (is-true (let ((dict1 (apply #'dict-insert (cons (empty-dict) some-numbers)))
                  (dict2 (apply #'dict-insert (cons (empty-dict) some-numbers))))
              (and (not (eq dict1 dict2))
-                  (dict-eq dict1 dict2)))))
+                  (dict-eq dict1 dict2))))
+  (is-true (dict-eq (empty-dict :test 'equal) (empty-dict :test #'equal))))
