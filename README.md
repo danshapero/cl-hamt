@@ -3,7 +3,7 @@ cl-hamt
 
 [![Build Status](https://travis-ci.org/danshapero/cl-hamt.svg?branch=master)](https://travis-ci.org/danshapero/cl-hamt)
 
-This library provides persistent dictionaries and sets in Common Lisp based on the hash array-mapped trie data structure.
+This library provides purely functional dictionaries and sets in Common Lisp based on the hash array-mapped trie data structure.
 The operations provided are:
 ```
 size
@@ -13,9 +13,13 @@ remove
 reduce
 filter
 map
+eq
 ```
 The versions for sets and dictionaries are obtained by prepending `set-` or `dict-` to the above symbols, so for example to lookup a key in a set and dictionary you would call `set-lookup` and `dict-lookup` respectively.
 An empty collection is created with the functions `empty-set` and `empty-dict`.
+
+See the `examples/` directory for some usage examples of the library, or the unit tests.
+Some benchmark code can be found in `tests/benchmarks.lisp`.
 
 
 Implementation
@@ -31,3 +35,6 @@ If the data are ordered and this ordering is important, a self-balancing binary 
 Additionally, one must provide an appropriate 32-bit hash function.
 We default to using `murmurhash`, as implemented in the Common Lisp package `cl-murmurhash`.
 Note that the built-in Common Lisp hash function `sxhash` is not a 32-bit hash; for example, on my 64-bit system with SBCL, it returns a 62-bit hash.
+
+While most operations on HAMTs have a complexity of log base-32 in the size of the data structure, there is quite a bit of overhead.
+HAMTs are probably less efficient for repeated operations on small-size sets and dictionaries than, say, a list or an association list.
