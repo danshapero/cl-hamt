@@ -90,8 +90,9 @@
                        "BEDUCKS"))
   (is (= 5 (set-size (set-remove set-with-collisions "BEDUCKS")))))
 
+(defvar max-number-value 1000)
 (defvar some-numbers
-  (loop for i from 0 to 100 collecting (random 1000)))
+  (loop for i from 0 to 100 collecting (random max-number-value)))
 
 (defvar set-without-collisions
   (reduce (lambda (s p)
@@ -110,6 +111,8 @@
              (and (not (eq set1 set2))
                   (set-eq set1 set2))))
   (is-false (set-eq (apply 'set-insert (cons (empty-set) some-numbers))
-                    (apply 'set-insert (cons (empty-set) (cdr some-numbers)))))
+                    (apply 'set-insert
+                           (cons (empty-set)
+                                 (cons (+ 1 max-number-value) some-numbers)))))
   (is-false (set-eq set-with-collisions set-without-collisions))
   (is-true (set-eq (empty-set :test 'equal) (empty-set :test #'equal))))
